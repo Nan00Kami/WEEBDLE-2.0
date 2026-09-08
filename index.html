@@ -17,7 +17,6 @@
       --correct: #6aaa64;
       --partial: #c9b458;
       --wrong: #787c7e;
-      --tile-empty: #ffffff;
       --highlight: #f3f4f6;
       --font-serif: 'Playfair Display', Georgia, serif;
       --font-sans: 'Libre Franklin', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -32,15 +31,10 @@
       --correct: #538d4e;
       --partial: #b59f3b;
       --wrong: #3a3a3c;
-      --tile-empty: #121213;
       --highlight: #272729;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: var(--bg);
@@ -54,7 +48,6 @@
       transition: background-color 0.2s, color 0.2s;
     }
 
-    /* NYT Header */
     header {
       width: 100%;
       max-width: 900px;
@@ -63,21 +56,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .header-icons {
-      display: flex;
-      gap: 12px;
-    }
-
-    button.icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     h1 {
@@ -89,31 +67,39 @@
       flex: 1;
     }
 
-    /* Container */
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     main {
       width: 100%;
-      max-width: 860px;
-      padding: 20px;
+      max-width: 880px;
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
     .sub-heading {
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--text-sub);
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
-    /* Search & Input */
     .search-wrapper {
       position: relative;
       width: 100%;
       max-width: 480px;
-      margin-bottom: 25px;
+      margin-bottom: 30px;
     }
 
     input[type="text"] {
@@ -126,7 +112,7 @@
       background: var(--surface);
       color: var(--text);
       outline: none;
-      transition: border 0.2s;
+      transition: border-color 0.2s;
     }
 
     input[type="text"]:focus {
@@ -135,44 +121,54 @@
 
     .autocomplete-list {
       position: absolute;
-      top: 100%;
+      top: calc(100% + 4px);
       left: 0;
       right: 0;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 0 0 4px 4px;
-      max-height: 220px;
+      border-radius: 4px;
+      max-height: 240px;
       overflow-y: auto;
-      z-index: 10;
+      z-index: 50;
       list-style: none;
       display: none;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
 
     .autocomplete-list li {
-      padding: 12px 16px;
+      padding: 10px 14px;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .autocomplete-list li:hover {
       background-color: var(--highlight);
     }
 
-    /* Table Board */
+    .autocomplete-list img {
+      width: 28px;
+      height: 38px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
     .board-container {
       width: 100%;
       overflow-x: auto;
-      padding-bottom: 20px;
+      padding-bottom: 16px;
     }
 
+    /* Grid Template: Poster (64px), Title (2fr), Year (1fr), Format (1fr), Source (1fr), Genres (2fr), Episodes (1fr) */
     .grid-header, .guess-row {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1.2fr 1.1fr 2fr 1fr;
+      grid-template-columns: 64px 2fr 1fr 1fr 1fr 2fr 1fr;
       gap: 6px;
-      min-width: 700px;
+      min-width: 720px;
       margin-bottom: 6px;
     }
 
@@ -191,37 +187,49 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 56px;
+      min-height: 64px;
       font-size: 13px;
       font-weight: 700;
       text-align: center;
       padding: 6px;
-      border-radius: 2px;
+      border-radius: 3px;
       color: #ffffff;
       line-height: 1.2;
-      position: relative;
       animation: flipIn 0.5s ease-in forwards;
     }
 
-    .tile.correct { background-color: var(--correct); border: 1px solid var(--correct); }
-    .tile.partial { background-color: var(--partial); border: 1px solid var(--partial); }
-    .tile.wrong { background-color: var(--wrong); border: 1px solid var(--wrong); }
-
-    .indicator {
-      font-size: 10px;
-      font-weight: 800;
-      margin-top: 2px;
+    .tile-poster {
+      padding: 0;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
     }
 
-    /* Win/Loss Modal */
+    .tile-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .tile.correct { background-color: var(--correct); }
+    .tile.partial { background-color: var(--partial); }
+    .tile.wrong { background-color: var(--wrong); }
+
+    .indicator {
+      font-size: 11px;
+      font-weight: 800;
+      margin-top: 3px;
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.5);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 50;
+      z-index: 100;
     }
 
     .modal {
@@ -231,13 +239,20 @@
       max-width: 400px;
       width: 90%;
       text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .modal img {
+      width: 110px;
+      height: 155px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 16px;
     }
 
     .modal h2 {
       font-family: var(--font-serif);
       font-size: 26px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .modal p {
@@ -250,13 +265,10 @@
       background: var(--correct);
       color: #fff;
       border: none;
-      padding: 10px 20px;
+      padding: 10px 24px;
       font-weight: 700;
-      font-size: 14px;
       border-radius: 4px;
       cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     @keyframes flipIn {
@@ -270,27 +282,25 @@
   <header>
     <div style="width: 24px;"></div>
     <h1>WEEBDLE</h1>
-    <div class="header-icons">
-      <button class="icon-btn" id="themeToggle" title="Toggle Theme" aria-label="Toggle Theme">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-      </button>
-    </div>
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle Theme">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
   </header>
 
   <main>
-    <div class="sub-heading">Guess today's mystery anime</div>
+    <div class="sub-heading">Guess the mystery anime (2010 – 2026)</div>
 
     <div class="search-wrapper">
-      <input type="text" id="animeInput" placeholder="Type anime title..." autocomplete="off" />
+      <input type="text" id="animeInput" placeholder="Search anime title..." autocomplete="off" />
       <ul class="autocomplete-list" id="autoList"></ul>
     </div>
 
     <div class="board-container">
       <div class="grid-header">
+        <span>Poster</span>
         <span>Title</span>
         <span>Year</span>
         <span>Format</span>
-        <span>Studio</span>
         <span>Source</span>
         <span>Genres</span>
         <span>Episodes</span>
@@ -301,50 +311,57 @@
 
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <h2 id="modalTitle">Brilliant!</h2>
-      <p id="modalMsg">You found today's anime in 3 tries.</p>
-      <button class="btn" onclick="document.getElementById('modalOverlay').style.display='none'">View Grid</button>
+      <img id="modalImg" src="" alt="Mystery Anime Poster" />
+      <h2 id="modalTitle">Splendid!</h2>
+      <p id="modalMsg"></p>
+      <button class="btn" onclick="document.getElementById('modalOverlay').style.display='none'">View Board</button>
     </div>
   </div>
 
   <script>
-    // 1. Anime Dataset
+    // Embedded dataset spanning 2010-2026 (No API or scraping needed)
     const ANIME_DB = [
-      { title: "Death Note", year: 2006, format: "TV", studio: "Madhouse", source: "Manga", genres: ["Mystery", "Supernatural", "Suspense"], episodes: 37 },
-      { title: "Fullmetal Alchemist: Brotherhood", year: 2009, format: "TV", studio: "Bones", source: "Manga", genres: ["Action", "Adventure", "Fantasy"], episodes: 64 },
-      { title: "Attack on Titan", year: 2013, format: "TV", studio: "Wit Studio", source: "Manga", genres: ["Action", "Drama", "Suspense"], episodes: 89 },
-      { title: "Steins;Gate", year: 2011, format: "TV", studio: "White Fox", source: "Visual Novel", genres: ["Drama", "Sci-Fi", "Suspense"], episodes: 24 },
-      { title: "Spirited Away", year: 2001, format: "Movie", studio: "Studio Ghibli", source: "Original", genres: ["Adventure", "Supernatural"], episodes: 1 },
-      { title: "Demon Slayer", year: 2019, format: "TV", studio: "ufotable", source: "Manga", genres: ["Action", "Supernatural"], episodes: 55 },
-      { title: "Jujutsu Kaisen", year: 2020, format: "TV", studio: "MAPPA", source: "Manga", genres: ["Action", "Fantasy"], episodes: 47 },
-      { title: "Neon Genesis Evangelion", year: 1995, format: "TV", studio: "Gainax", source: "Original", genres: ["Mecha", "Sci-Fi", "Psychological"], episodes: 26 },
-      { title: "Cowboy Bebop", year: 1998, format: "TV", studio: "Sunrise", source: "Original", genres: ["Action", "Sci-Fi"], episodes: 26 },
-      { title: "Your Name.", year: 2016, format: "Movie", studio: "CoMix Wave Films", source: "Original", genres: ["Drama", "Romance", "Supernatural"], episodes: 1 },
-      { title: "Cyberpunk: Edgerunners", year: 2022, format: "ONA", studio: "Trigger", source: "Video Game", genres: ["Action", "Sci-Fi"], episodes: 10 },
-      { title: "Frieren: Beyond Journey's End", year: 2023, format: "TV", studio: "Madhouse", source: "Manga", genres: ["Adventure", "Drama", "Fantasy"], episodes: 28 },
-      { title: "Chainsaw Man", year: 2022, format: "TV", studio: "MAPPA", source: "Manga", genres: ["Action", "Supernatural"], episodes: 12 },
-      { title: "Vinland Saga", year: 2019, format: "TV", studio: "Wit Studio", source: "Manga", genres: ["Action", "Adventure", "Drama"], episodes: 48 },
-      { title: "Code Geass", year: 2006, format: "TV", studio: "Sunrise", source: "Original", genres: ["Action", "Mecha", "Drama"], episodes: 50 }
+      { id: 1, title: "Attack on Titan", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-73PEFnOiVUbt.png", year: 2013, format: "TV", source: "Manga", genres: ["Action", "Drama", "Fantasy"], episodes: 89 },
+      { id: 2, title: "Demon Slayer: Kimetsu no Yaiba", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101922-PEn1CTyeNhKt.png", year: 2019, format: "TV", source: "Manga", genres: ["Action", "Fantasy", "Supernatural"], episodes: 55 },
+      { id: 3, title: "Jujutsu Kaisen", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113415-bbBWj4pEFArM.jpg", year: 2020, format: "TV", source: "Manga", genres: ["Action", "Fantasy", "Supernatural"], episodes: 47 },
+      { id: 4, title: "Steins;Gate", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9253-7pdcVzQSkpKq.png", year: 2011, format: "TV", source: "Visual Novel", genres: ["Drama", "Sci-Fi", "Suspense"], episodes: 24 },
+      { id: 5, title: "Frieren: Beyond Journey's End", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-n1HJZcLueDzC.jpg", year: 2023, format: "TV", source: "Manga", genres: ["Adventure", "Drama", "Fantasy"], episodes: 28 },
+      { id: 6, title: "My Hero Academia", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-oLH3bGIfltBp.jpg", year: 2016, format: "TV", source: "Manga", genres: ["Action", "Adventure", "Sci-Fi"], episodes: 138 },
+      { id: 7, title: "Hunter x Hunter (2011)", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11061-sIpBprNR2AOx.png", year: 2011, format: "TV", source: "Manga", genres: ["Action", "Adventure", "Fantasy"], episodes: 148 },
+      { id: 8, title: "One Punch Man", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21087-UV2tu6exnvNm.jpg", year: 2015, format: "TV", source: "Web Manga", genres: ["Action", "Comedy", "Sci-Fi"], episodes: 24 },
+      { id: 9, title: "Chainsaw Man", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx127230-FloXFsyoFhkP.png", year: 2022, format: "TV", source: "Manga", genres: ["Action", "Drama", "Supernatural"], episodes: 12 },
+      { id: 10, title: "Your Name.", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21519-XIr3Pecrw1t4.png", year: 2016, format: "Movie", source: "Original", genres: ["Drama", "Romance", "Supernatural"], episodes: 1 },
+      { id: 11, title: "A Silent Voice", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20954-UMb6ClB7tblT.jpg", year: 2016, format: "Movie", source: "Manga", genres: ["Drama", "Romance", "Slice of Life"], episodes: 1 },
+      { id: 12, title: "Cyberpunk: Edgerunners", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx120377-p4RQAwbwgztr.jpg", year: 2022, format: "ONA", source: "Video Game", genres: ["Action", "Sci-Fi"], episodes: 10 },
+      { id: 13, title: "Vinland Saga", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-4xRjJb80cO24.jpg", year: 2019, format: "TV", source: "Manga", genres: ["Action", "Adventure", "Drama"], episodes: 48 },
+      { id: 14, title: "Mob Psycho 100", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-7K5vO02Kkg5M.jpg", year: 2016, format: "TV", source: "Web Manga", genres: ["Action", "Comedy", "Supernatural"], episodes: 37 },
+      { id: 15, title: "Violet Evergarden", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21827-10fJdoDuW4Ta.png", year: 2018, format: "TV", source: "Light Novel", genres: ["Drama", "Fantasy", "Slice of Life"], episodes: 13 },
+      { id: 16, title: "KonoSuba: God's Blessing on This Wonderful World!", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21202-kH0flB5Ua3bv.jpg", year: 2016, format: "TV", source: "Light Novel", genres: ["Adventure", "Comedy", "Fantasy"], episodes: 31 },
+      { id: 17, title: "Haikyu!!", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-YvYQj26Z8mQz.jpg", year: 2014, format: "TV", source: "Manga", genres: ["Comedy", "Drama", "Sports"], episodes: 85 },
+      { id: 18, title: "Re:ZERO -Starting Life in Another World-", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21355-qDwhp8nZ097U.png", year: 2016, format: "TV", source: "Light Novel", genres: ["Action", "Drama", "Fantasy"], episodes: 50 },
+      { id: 19, title: "Sword Art Online", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11757-lJDyPtxTXrA1.png", year: 2012, format: "TV", source: "Light Novel", genres: ["Action", "Adventure", "Fantasy"], episodes: 96 },
+      { id: 20, title: "Tokyo Ghoul", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20605-ffHNQWbDNpLL.jpg", year: 2014, format: "TV", source: "Manga", genres: ["Action", "Horror", "Mystery"], episodes: 48 },
+      { id: 21, title: "Spy x Family", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140960-vNeGFiDdpmdA.jpg", year: 2022, format: "TV", source: "Manga", genres: ["Action", "Comedy"], episodes: 37 },
+      { id: 22, title: "Bocchi the Rock!", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx130003-5VG5embg88Es.png", year: 2022, format: "TV", source: "Manga", genres: ["Comedy", "Music", "Slice of Life"], episodes: 12 },
+      { id: 23, title: "Solo Leveling", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151807-31Gv5vA54c7v.jpg", year: 2024, format: "TV", source: "Web Manga", genres: ["Action", "Adventure", "Fantasy"], episodes: 12 },
+      { id: 24, title: "Dungeon Meshi", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153518-E1xM93uMhCgA.jpg", year: 2024, format: "TV", source: "Manga", genres: ["Adventure", "Comedy", "Fantasy"], episodes: 24 },
+      { id: 25, title: "Kaiju No. 8", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-E0L2mUa8U0kE.jpg", year: 2024, format: "TV", source: "Manga", genres: ["Action", "Sci-Fi"], episodes: 12 }
     ];
 
-    // 2. Deterministic Daily Target Logic (Matches NYT's 1-puzzle-a-day)
-    function getDailyTarget() {
-      const epoch = new Date(2024, 0, 1).getTime();
-      const now = new Date().getTime();
-      const dayIndex = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
-      return ANIME_DB[dayIndex % ANIME_DB.length];
-    }
+    // Pick deterministic daily target using UTC date
+    const epoch = new Date("2024-01-01").getTime();
+    const now = Date.now();
+    const dayIndex = Math.floor((now - epoch) / 86400000);
+    const TARGET = ANIME_DB[dayIndex % ANIME_DB.length];
 
-    const TARGET = getDailyTarget();
     let guesses = [];
     let isGameOver = false;
 
-    // Elements
     const input = document.getElementById("animeInput");
     const autoList = document.getElementById("autoList");
     const guessesList = document.getElementById("guessesList");
 
-    // 3. Autocomplete UI
+    // Search Autocomplete
     input.addEventListener("input", () => {
       const val = input.value.trim().toLowerCase();
       autoList.innerHTML = "";
@@ -355,12 +372,12 @@
 
       const matches = ANIME_DB.filter(a => 
         a.title.toLowerCase().includes(val) && !guesses.includes(a.title)
-      );
+      ).slice(0, 6);
 
       if (matches.length > 0) {
         matches.forEach(item => {
           const li = document.createElement("li");
-          li.textContent = item.title;
+          li.innerHTML = `<img src="${item.image}" alt=""> <span>${item.title}</span>`;
           li.onclick = () => submitGuess(item);
           autoList.appendChild(li);
         });
@@ -370,7 +387,7 @@
       }
     });
 
-    // 4. Comparison Logic
+    // Comparison & Tile Generator
     function submitGuess(anime) {
       if (isGameOver) return;
 
@@ -381,78 +398,73 @@
       const row = document.createElement("div");
       row.className = "guess-row";
 
-      // Title
-      const tileTitle = createTile(anime.title, anime.title === TARGET.title ? "correct" : "wrong");
+      // 1. Poster Tile
+      const posterTile = document.createElement("div");
+      posterTile.className = "tile tile-poster";
+      posterTile.innerHTML = `<img src="${anime.image}" alt="${anime.title}" />`;
 
-      // Year
+      // 2. Title
+      const titleTile = createTile(anime.title, anime.title === TARGET.title ? "correct" : "wrong");
+
+      // 3. Year
       let yearClass = anime.year === TARGET.year ? "correct" : "wrong";
-      let yearIndicator = anime.year < TARGET.year ? "↑" : anime.year > TARGET.year ? "↓" : "";
-      const tileYear = createTile(anime.year, yearClass, yearIndicator);
+      let yearInd = anime.year < TARGET.year ? "↑" : anime.year > TARGET.year ? "↓" : "";
+      const yearTile = createTile(anime.year, yearClass, yearInd);
 
-      // Format
-      const tileFormat = createTile(anime.format, anime.format === TARGET.format ? "correct" : "wrong");
+      // 4. Format
+      const formatTile = createTile(anime.format, anime.format === TARGET.format ? "correct" : "wrong");
 
-      // Studio
-      const tileStudio = createTile(anime.studio, anime.studio === TARGET.studio ? "correct" : "wrong");
+      // 5. Source
+      const sourceTile = createTile(anime.source, anime.source === TARGET.source ? "correct" : "wrong");
 
-      // Source
-      const tileSource = createTile(anime.source, anime.source === TARGET.source ? "correct" : "wrong");
-
-      // Genres
-      const matchedGenres = anime.genres.filter(g => TARGET.genres.includes(g));
+      // 6. Genres
+      const matched = anime.genres.filter(g => TARGET.genres.includes(g));
       let genreClass = "wrong";
-      if (matchedGenres.length === TARGET.genres.length && anime.genres.length === TARGET.genres.length) {
+      if (matched.length === TARGET.genres.length && anime.genres.length === TARGET.genres.length) {
         genreClass = "correct";
-      } else if (matchedGenres.length > 0) {
+      } else if (matched.length > 0) {
         genreClass = "partial";
       }
-      const tileGenres = createTile(anime.genres.join(", "), genreClass);
+      const genreTile = createTile(anime.genres.join(", "), genreClass);
 
-      // Episodes
+      // 7. Episodes
       let epClass = anime.episodes === TARGET.episodes ? "correct" : "wrong";
-      let epIndicator = anime.episodes < TARGET.episodes ? "↑" : anime.episodes > TARGET.episodes ? "↓" : "";
-      const tileEpisodes = createTile(anime.episodes, epClass, epIndicator);
+      let epInd = anime.episodes < TARGET.episodes ? "↑" : anime.episodes > TARGET.episodes ? "↓" : "";
+      const epTile = createTile(anime.episodes, epClass, epInd);
 
-      // Append row
-      row.append(tileTitle, tileYear, tileFormat, tileStudio, tileSource, tileGenres, tileEpisodes);
+      row.append(posterTile, titleTile, yearTile, formatTile, sourceTile, genreTile, epTile);
       guessesList.prepend(row);
 
-      // Win Condition
       if (anime.title === TARGET.title) {
         isGameOver = true;
         input.disabled = true;
-        showModal(true, guesses.length);
+        showModal(guesses.length);
       }
     }
 
-    function createTile(text, statusClass, indicator = "") {
+    function createTile(text, status, indicator = "") {
       const tile = document.createElement("div");
-      tile.className = `tile ${statusClass}`;
+      tile.className = `tile ${status}`;
       tile.innerHTML = `<span>${text}</span>` + (indicator ? `<span class="indicator">${indicator}</span>` : "");
       return tile;
     }
 
-    function showModal(won, count) {
+    function showModal(count) {
       setTimeout(() => {
+        document.getElementById("modalImg").src = TARGET.image;
+        document.getElementById("modalMsg").innerText = `You uncovered ${TARGET.title} in ${count} ${count === 1 ? 'guess' : 'guesses'}!`;
         document.getElementById("modalOverlay").style.display = "flex";
-        document.getElementById("modalTitle").innerText = won ? "Splendid!" : "Game Over";
-        document.getElementById("modalMsg").innerText = won 
-          ? `You guessed ${TARGET.title} in ${count} ${count === 1 ? 'try' : 'tries'}!` 
-          : `The correct anime was ${TARGET.title}.`;
       }, 500);
     }
 
-    // Theme Toggle
+    // Light/Dark Theme Toggle
     document.getElementById("themeToggle").onclick = () => {
       const isDark = document.body.getAttribute("data-theme") === "dark";
       document.body.setAttribute("data-theme", isDark ? "light" : "dark");
     };
 
-    // Close autocomplete on external click
     document.addEventListener("click", (e) => {
-      if (!e.target.closest('.search-wrapper')) {
-        autoList.style.display = "none";
-      }
+      if (!e.target.closest('.search-wrapper')) autoList.style.display = "none";
     });
   </script>
 </body>
