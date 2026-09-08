@@ -152,3 +152,86 @@ document.getElementById("share-btn").onclick = () => {
   navigator.clipboard.writeText(shareText);
   alert("Score copied to clipboard!");
 };
+
+
+// 12 Curated Quotes with Respective Backdrops
+const ANIME_QUOTES = [
+  {
+    quote: "Nah, I'd win",
+    author: "Satoru Gojo (Jujutsu Kaisen)",
+    image: "https://images.wallpapersden.com/image/download/jujutsu-kaisen-satoru-gojo_bGtubmuUmZqaraWkpJRmbmdlrWZlbWU.jpg"
+  },
+  {
+    quote: "The One Piece is real!",
+    author: "Edward \"Whitebeard\" Newgate (One Piece)",
+    image: "https://images.alphacoders.com/790/thumb-1920-790574.png"
+  },
+  {
+    quote: "People die if they are killed.",
+    author: "Shirou Emiya (Fate/stay night)",
+    image: "https://images7.alphacoders.com/752/thumb-1920-752259.png"
+  },
+  {
+    quote: "I am atomic.",
+    author: "Cid Kagenou / Shadow (The Eminence in Shadow)",
+    image: "https://images5.alphacoders.com/129/thumb-1920-1294187.png"
+  },
+  {
+    quote: "The Archer class really is made up of archers!",
+    author: "Rin Tohsaka (Fate/stay night: Unlimited Blade Works)",
+    image: "https://images6.alphacoders.com/902/thumb-1920-902733.png"
+  },
+  {
+    quote: "Stand proud. You're strong.",
+    author: "Ryomen Sukuna (Jujutsu Kaisen)",
+    image: "https://4kwallpapers.com/images/walls/thumbs_2t/25100.jpg"
+  },
+  {
+    quote: "Throughout Heaven and Earth, I alone am the honored one.",
+    author: "Satoru Gojo (Jujutsu Kaisen)",
+    image: "https://images8.alphacoders.com/125/thumb-1920-1253107.jpg"
+  },
+  {
+    quote: "Did you really think that killing me would be enough to make me die?",
+    author: "Anos Voldigoad (The Misfit of Demon King Academy)",
+    image: "https://images.alphacoders.com/109/thumb-1920-1090513.jpg"
+  },
+  {
+    quote: "Waku waku!",
+    author: "Anya Forger (Spy × Family)",
+    image: "https://images6.alphacoders.com/133/thumb-1920-1333611.jpeg"
+  },
+  {
+    quote: "You thought your first kiss would be JoJo, but it was me, Dio!",
+    author: "Dio Brando (JoJo's Bizarre Adventure: Phantom Blood)",
+    image: "https://images5.alphacoders.com/659/thumb-1920-659516.png"
+  },
+  {
+    quote: "Next, it's your turn.",
+    author: "All Might / Toshinori Yagi (My Hero Academia)",
+    image: "https://images2.alphacoders.com/737/thumb-1920-737139.png"
+  },
+  {
+    quote: "Everything is not daijobu.",
+    author: "Ken Kaneki (Tokyo Ghoul)",
+    image: "https://images7.alphacoders.com/596/thumb-1920-596590.jpg"
+  }
+];
+
+function renderRandomQuote() {
+  const chosen = ANIME_QUOTES[Math.floor(Math.random() * ANIME_QUOTES.length)];
+  const quoteText = document.getElementById("quote-text");
+  const quoteAuthor = document.getElementById("quote-author");
+  const quoteImg = document.getElementById("quote-img");
+
+  if (quoteText && quoteAuthor && quoteImg) {
+    quoteText.textContent = `“${chosen.quote}”`;
+    quoteAuthor.textContent = `— ${chosen.author}`;
+    quoteImg.src = chosen.image;
+  }
+}
+
+// Render immediately on initial page load
+renderRandomQuote();
+
+
