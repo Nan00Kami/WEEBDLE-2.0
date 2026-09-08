@@ -1,160 +1,161 @@
-const WORD_LENGTH = 5;
+const GRAPHQL_ENDPOINT = 'https://graphql.anilist.co';
 const MAX_GUESSES = 6;
-let currentRow = 0;
-let currentCol = 0;
-let gameOver = false;
+let animeCatalog = [];
 let targetAnime = null;
-let targetWord = "";
+let currentGuesses = 0;
 
-// Fallback pool in case external API is rate-limited initially
-const fallbackPool = [
-  { title: "HAIKY", name: "Haikyuu!!", rank: 110, year: 2014, genres: ["Sports"], poster: "https://cdn.myanimelist.net/images/anime/7/76014.jpg" },
-  { title: "BEAST", name: "Beastars", rank: 450, year: 2019, genres: ["Drama", "Slice of Life"], poster: "https://cdn.myanimelist.net/images/anime/1245/109156.jpg" },
-  { title: "TORAD", name: "Toradora!", rank: 312, year: 2008, genres: ["Romance", "Comedy"], poster: "https://cdn.myanimelist.net/images/anime/13/22128.jpg" },
-  { title: "BLEAC", name: "Bleach", rank: 50, year: 2012, genres: ["Action"], poster: "https://cdn.myanimelist.net/images/anime/3/40451.jpg" }
-];
+const statusEl = document.getElementById('status');
+const inputEl = document.getElementById('guess-input');
+const dropdownEl = document.getElementById('dropdown');
+const guessesBody = document.getElementById('guesses-body');
+const modal = document.getElementById('game-over-modal');
 
-// 1. Fetch MAL 500 dataset into localStorage via Jikan v4
-async function loadAnimePool() {
-  let pool = JSON.parse(localStorage.getItem("weebdle_pool") || "[]");
-  if (pool.length < 50) {
-    try {
-      pool = [];
-      for (let p = 1; p <= 4; p++) { // Fetching 4 pages (100 top entries) initially to avoid MAL 429 errors
-        const res = await fetch(`https://api.jikan.moe/v4/top/anime?page=${p}&filter=bypopularity`);
-        const data = await res.json();
-        data.data.forEach(a => {
-          const cleanTitle = a.title.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 5);
-          if (cleanTitle.length === 5) {
-            pool.push({
-              title: cleanTitle,
-              name: a.title,
-              rank: a.rank || "N/A",
-              year: a.aired?.prop?.from?.year || 2020,
-              genres: a.genres.map(g => g.name),
-              poster: a.images?.jpg?.image_url
-            });
-          }
-        });
-      }
-      localStorage.setItem("weebdle_pool", JSON.stringify(pool));
-    } catch (e) {
-      pool = fallbackPool;
+// GraphQL query targeting top anime released between 2010 and 2026
+const query = `
+query ($page: Int) {
+  Page(page: $page, perPage: 50) {
+    media(type: ANIME, sort: POPULARITY_DESC, startDate_greater: 20100000, startDate_lesser: 20261231, format_in: [TV, MOVIE]) {
+      id
+      title { english romaji }
+      coverImage { medium }
+      startDate { year }
+      averageScore
+      genres
     }
   }
-  return pool.length > 0 ? pool : fallbackPool;
 }
+`;
 
-// 2. Initialize Board
-function initBoard() {
-  const board = document.getElementById("board");
-  board.innerHTML = "";
-  for (let r = 0; r < MAX_GUESSES; r++) {
-    const row = document.createElement("div");
-    row.className = "row";
-    row.id = `row-${r}`;
-    for (let c = 0; c < WORD_LENGTH; c++) {
-      const tile = document.createElement("div");
-      tile.className = "tile";
-      tile.id = `tile-${r}-${c}`;
-      row.appendChild(tile);
+async function fetchAnimePool() {
+  const cached = localStorage.getItem('weebdle_catalog_v1');
+  if (cached) {
+    animeCatalog = JSON.parse(cached);
+    initGame();
+    return;
+  }
+
+  statusEl.innerText = "Downloading Top 500 popular anime (2010–2026)...";
+  
+  try {
+    // Fetch 10 pages x 50 items = 500 items
+    for (let page = 1; page <= 10; page++) {
+      const response = await fetch(GRAPHQL_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ query, variables: { page } })
+      });
+      const resData = await response.json();
+      const pageList = resData.data.Page.media.map(item => ({
+        id: item.id,
+        title: item.title.english || item.title.romaji,
+        poster: item.coverImage.medium,
+        year: item.startDate.year || 2020,
+        score: item.averageScore || 70,
+        genres: item.genres || []
+      }));
+      animeCatalog.push(...pageList);
     }
-    board.appendChild(row);
+    localStorage.setItem('weebdle_catalog_v1', JSON.stringify(animeCatalog));
+    initGame();
+  } catch (err) {
+    statusEl.innerText = "Failed to load API data. Check network connection.";
   }
 }
 
-// 3. Setup Virtual Keyboard
-function initKeyboard() {
-  const kb = document.getElementById("keyboard");
-  const layout = [
-    ["Q","W","E","R","T","Y","U","I","O","P"],
-    ["A","S","D","F","G","H","J","K","L"],
-    ["ENTER","Z","X","C","V","B","N","M","⌫"]
-  ];
-  kb.innerHTML = "";
-  layout.forEach(row => {
-    const rDiv = document.createElement("div");
-    rDiv.className = "kb-row";
-    row.forEach(k => {
-      const btn = document.createElement("button");
-      btn.textContent = k;
-      btn.className = `key ${k.length > 1 ? "wide" : ""}`;
-      btn.setAttribute("data-key", k);
-      btn.onclick = () => handleInput(k);
-      rDiv.appendChild(btn);
-    });
-    kb.appendChild(rDiv);
+function initGame() {
+  statusEl.innerText = `Guess today's anime (${animeCatalog.length} available). You have 6 attempts.`;
+  inputEl.disabled = false;
+  
+  // Pick random anime for this round
+  targetAnime = animeCatalog[Math.floor(Math.random() * animeCatalog.length)];
+}
+
+// Search Dropdown Listener
+inputEl.addEventListener('input', () => {
+  const query = inputEl.value.trim().toLowerCase();
+  dropdownEl.innerHTML = '';
+  if (!query) { dropdownEl.style.display = 'none'; return; }
+
+  const matches = animeCatalog
+    .filter(a => a.title.toLowerCase().includes(query))
+    .slice(0, 6);
+
+  if (matches.length === 0) { dropdownEl.style.display = 'none'; return; }
+
+  matches.forEach(item => {
+    const div = document.createElement('div');
+    div.innerText = item.title;
+    div.onclick = () => selectGuess(item);
+    dropdownEl.appendChild(div);
   });
-}
+  dropdownEl.style.display = 'block';
+});
 
-function handleInput(key) {
-  if (gameOver) return;
-  if (key === "⌫" || key === "BACKSPACE") {
-    if (currentCol > 0) {
-      currentCol--;
-      document.getElementById(`tile-${currentRow}-${currentCol}`).textContent = "";
-    }
-  } else if (key === "ENTER") {
-    if (currentCol === WORD_LENGTH) submitGuess();
-  } else if (/^[A-Z]$/.test(key) && currentCol < WORD_LENGTH) {
-    document.getElementById(`tile-${currentRow}-${currentCol}`).textContent = key;
-    currentCol++;
+function selectGuess(guess) {
+  dropdownEl.style.display = 'none';
+  inputEl.value = '';
+  currentGuesses++;
+  renderGuessRow(guess);
+
+  if (guess.id === targetAnime.id) {
+    endGame(true);
+  } else if (currentGuesses >= MAX_GUESSES) {
+    endGame(false);
   }
 }
 
-function submitGuess() {
-  let guess = "";
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    guess += document.getElementById(`tile-${currentRow}-${i}`).textContent;
+function renderGuessRow(guess) {
+  const tr = document.createElement('tr');
+
+  // 1. Poster
+  const tdPoster = document.createElement('td');
+  tdPoster.className = 'poster-cell';
+  tdPoster.innerHTML = `<img src="${guess.poster}" alt="Poster" />`;
+
+  // 2. Title
+  const tdTitle = document.createElement('td');
+  tdTitle.innerText = guess.title;
+  tdTitle.className = (guess.id === targetAnime.id) ? 'correct' : 'wrong';
+
+  // 3. Year Comparison
+  const tdYear = document.createElement('td');
+  let yearArrow = '';
+  if (guess.year < targetAnime.year) yearArrow = ' ⬆';
+  if (guess.year > targetAnime.year) yearArrow = ' ⬇';
+  tdYear.innerText = `${guess.year}${yearArrow}`;
+  tdYear.className = (guess.year === targetAnime.year) ? 'correct' : 'wrong';
+
+  // 4. Score Comparison
+  const tdScore = document.createElement('td');
+  let scoreArrow = '';
+  if (guess.score < targetAnime.score) scoreArrow = ' ⬆';
+  if (guess.score > targetAnime.score) scoreArrow = ' ⬇';
+  tdScore.innerText = `${guess.score}\%${scoreArrow}`;
+  tdScore.className = (guess.score === targetAnime.score) ? 'correct' : 'wrong';
+
+  // 5. Genres Comparison
+  const tdGenre = document.createElement('td');
+  const sharedGenres = guess.genres.filter(g => targetAnime.genres.includes(g));
+  tdGenre.innerText = guess.genres.slice(0, 3).join(', ');
+  if (sharedGenres.length === targetAnime.genres.length && guess.genres.length === targetAnime.genres.length) {
+    tdGenre.className = 'correct';
+  } else if (sharedGenres.length > 0) {
+    tdGenre.className = 'partial';
+  } else {
+    tdGenre.className = 'wrong';
   }
 
-  const targetArr = targetWord.split("");
-  const guessArr = guess.split("");
-
-  // Letter matching pass
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    const tile = document.getElementById(`tile-${currentRow}-${i}`);
-    const keyBtn = document.querySelector(`.key[data-key="${guessArr[i]}"]`);
-    if (guessArr[i] === targetArr[i]) {
-      tile.setAttribute("data-state", "correct");
-      if (keyBtn) keyBtn.setAttribute("data-state", "correct");
-      targetArr[i] = null;
-    } else if (targetArr.includes(guessArr[i])) {
-      tile.setAttribute("data-state", "present");
-      if (keyBtn && keyBtn.getAttribute("data-state") !== "correct") {
-        keyBtn.setAttribute("data-state", "present");
-      }
-    } else {
-      tile.setAttribute("data-state", "absent");
-      if (keyBtn && !keyBtn.hasAttribute("data-state")) {
-        keyBtn.setAttribute("data-state", "absent");
-      }
-    }
-  }
-
-  if (guess === targetWord || currentRow === MAX_GUESSES - 1) {
-    gameOver = true;
-    document.getElementById("anime-poster").classList.add("revealed");
-    setTimeout(() => alert(guess === targetWord ? "You Won!" : `Game Over! Word: ${targetWord} (${targetAnime.name})`), 400);
-  }
-
-  currentRow++;
-  currentCol = 0;
+  tr.append(tdPoster, tdTitle, tdYear, tdScore, tdGenre);
+  guessesBody.appendChild(tr);
 }
 
-window.addEventListener("keydown", (e) => handleInput(e.key.toUpperCase()));
-
-async function start() {
-  initBoard();
-  initKeyboard();
-  const pool = await loadAnimePool();
-  targetAnime = pool[Math.floor(Math.random() * pool.length)];
-  targetWord = targetAnime.title;
-
-  document.getElementById("anime-poster").src = targetAnime.poster;
-  document.getElementById("meta-year").textContent = targetAnime.year;
-  document.getElementById("meta-rank").textContent = `#${targetAnime.rank}`;
-  document.getElementById("meta-genres").textContent = targetAnime.genres.join(", ");
+function endGame(won) {
+  inputEl.disabled = true;
+  modal.style.display = 'flex';
+  document.getElementById('modal-title').innerText = won ? "VICTORY" : "GAME OVER";
+  document.getElementById('modal-desc').innerText = won
+    ? `You deduced it in ${currentGuesses} guesses!`
+    : `The correct anime was: ${targetAnime.title}`;
 }
 
-start();
+fetchAnimePool();
