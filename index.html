@@ -4,198 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WEEBDLE — The Daily Anime Guessing Game</title>
-  <style>
-    :root {
-      --bg-color: #121213;
-      --card-bg: #1a1a1b;
-      --border-color: #3a3a3c;
-      --text-main: #ffffff;
-      --text-sub: #818384;
-      --green: #538d4e;
-      --yellow: #b59f3b;
-      --gray: #3a3a3c;
-      --font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      font-family: var(--font-family);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 10px;
-    }
-
-    header {
-      width: 100%;
-      max-width: 800px;
-      text-align: center;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border-color);
-      letter-spacing: 4px;
-      font-size: 26px;
-      font-weight: 800;
-    }
-
-    #status {
-      margin-top: 15px;
-      font-size: 14px;
-      color: var(--text-sub);
-    }
-
-    .search-container {
-      position: relative;
-      width: 100%;
-      max-width: 500px;
-      margin: 20px 0;
-    }
-
-    input#guess-input {
-      width: 100%;
-      padding: 14px 16px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      color: #fff;
-      font-size: 16px;
-      outline: none;
-    }
-    input#guess-input:focus { border-color: #565758; }
-
-    .dropdown {
-      position: absolute;
-      top: 105%;
-      left: 0;
-      right: 0;
-      background: #181819;
-      border: 1px solid var(--border-color);
-      max-height: 250px;
-      overflow-y: auto;
-      z-index: 10;
-      display: none;
-    }
-
-    .dropdown div {
-      padding: 10px 14px;
-      cursor: pointer;
-      font-size: 14px;
-      border-bottom: 1px solid #272729;
-    }
-    .dropdown div:hover { background-color: #272729; }
-
-    .board-container {
-      width: 100%;
-      max-width: 900px;
-      overflow-x: auto;
-      margin-top: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 6px;
-      text-align: center;
-      font-size: 13px;
-    }
-
-    th {
-      color: var(--text-sub);
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 1px;
-      padding-bottom: 8px;
-    }
-
-    td {
-      background-color: var(--card-bg);
-      border: 2px solid var(--border-color);
-      height: 75px;
-      min-width: 80px;
-      font-weight: 700;
-      border-radius: 4px;
-      vertical-align: middle;
-      padding: 6px;
-    }
-
-    .poster-cell img {
-      width: 48px;
-      height: 68px;
-      object-fit: cover;
-      border-radius: 2px;
-      display: block;
-      margin: 0 auto;
-    }
-
-    .correct { background-color: var(--green) !important; border-color: var(--green) !important; }
-    .partial { background-color: var(--yellow) !important; border-color: var(--yellow) !important; }
-    .wrong { background-color: var(--gray) !important; border-color: var(--gray) !important; }
-
-    #game-over-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      justify-content: center;
-      align-items: center;
-      z-index: 99;
-    }
-
-    .modal-content {
-      background: var(--card-bg);
-      padding: 30px;
-      border-radius: 8px;
-      text-align: center;
-      border: 1px solid var(--border-color);
-      max-width: 400px;
-      width: 90%;
-    }
-
-    .modal-content h2 { margin-bottom: 12px; }
-    .modal-content button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: var(--green);
-      color: #fff;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="app-container">
+    <header class="header">
+      <div class="header-left">
+        <button id="help-btn" class="icon-btn" aria-label="Help">?</button>
+      </div>
+      <h1 class="title">WEEBDLE</h1>
+      <div class="header-right">
+        <button id="stats-btn" class="icon-btn" aria-label="Stats">📊</button>
+      </div>
+    </header>
 
-  <header>WEEBDLE</header>
-  <div id="status">Loading anime dataset from 2010–2026...</div>
+    <div class="instruction-banner">
+      Guess the secret anime from 2010–2026. Each guess reveals directional clues.
+    </div>
 
-  <div class="search-container">
-    <input type="text" id="guess-input" placeholder="Guess an anime (e.g. Jujutsu Kaisen)..." autocomplete="off" disabled />
-    <div id="dropdown" class="dropdown"></div>
-  </div>
+    <!-- Input Section -->
+    <div class="search-section">
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          id="anime-input" 
+          placeholder="Search anime (e.g. Jujutsu Kaisen, Steins;Gate)..." 
+          autocomplete="off" 
+        />
+        <ul id="autocomplete-list" class="autocomplete-dropdown hidden"></ul>
+      </div>
+    </div>
 
-  <div class="board-container">
-    <table id="game-board">
-      <thead>
-        <tr>
-          <th>Poster</th>
-          <th>Title</th>
-          <th>Year</th>
-          <th>Rank / Score</th>
-          <th>Main Genres</th>
-        </tr>
-      </thead>
-      <tbody id="guesses-body"></tbody>
-    </table>
-  </div>
+    <!-- Guess Table / Grid -->
+    <div class="grid-container">
+      <div class="grid-header">
+        <div>Poster</div>
+        <div>Title</div>
+        <div>Year</div>
+        <div>MAL Rank</div>
+        <div>Genres</div>
+      </div>
+      <div id="guesses-container" class="guesses-list">
+        <!-- Rows injected dynamically via app.js -->
+      </div>
+    </div>
 
-  <div id="game-over-modal">
-    <div class="modal-content">
-      <h2 id="modal-title"></h2>
-      <p id="modal-desc"></p>
-      <button onclick="location.reload()">Play Again</button>
+    <!-- Win/Loss Overlay Modal -->
+    <div id="game-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-modal" class="close-btn">&times;</button>
+        <h2 id="modal-title">Victory!</h2>
+        <div id="modal-poster-wrap"></div>
+        <p id="modal-desc"></p>
+        <div class="share-box">
+          <button id="share-btn">Share Result 📋</button>
+        </div>
+      </div>
     </div>
   </div>
 
