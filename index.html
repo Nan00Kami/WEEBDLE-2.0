@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WEEBDLE - The Anime Wordle</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1b;
+      --border: #d3d6da;
+      --correct: #6aaa64;
+      --present: #c9b458;
+      --absent: #787c7e;
+      --key-bg: #d3d6da;
+      --font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+    }
+    [data-theme="dark"] {
+      --bg: #121213;
+      --text: #ffffff;
+      --border: #3a3a3c;
+      --correct: #538d4e;
+      --present: #b59f3b;
+      --absent: #3a3a3c;
+      --key-bg: #818384;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-family);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+    header {
+      width: 100%;
+      max-width: 500px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      padding: 10px 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    #game-container {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-grow: 1;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    #board {
+      display: grid;
+      grid-gap: 5px;
+      margin: auto 0;
+    }
+    .row { display: flex; gap: 5px; }
+    .tile {
+      width: 52px;
+      height: 52px;
+      border: 2px solid var(--border);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .tile[data-state="correct"] { background: var(--correct); color: white; border-color: var(--correct); }
+    .tile[data-state="present"] { background: var(--present); color: white; border-color: var(--present); }
+    .tile[data-state="absent"] { background: var(--absent); color: white; border-color: var(--absent); }
+
+    /* Target Hints / Stats Dropdown */
+    #hint-card {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      display: flex;
+      gap: 12px;
+    }
+    #hint-card img { width: 60px; height: 85px; object-fit: cover; border-radius: 4px; filter: blur(8px); transition: filter 0.3s; }
+    #hint-card img.revealed { filter: blur(0); }
+
+    #keyboard { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 6px; }
+    .kb-row { display: flex; justify-content: center; gap: 4px; }
+    .key {
+      background: var(--key-bg);
+      color: var(--text);
+      border-radius: 4px;
+      border: none;
+      height: 50px;
+      flex: 1;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .key.wide { flex: 1.5; font-size: 12px; }
+    .key[data-state="correct"] { background: var(--correct); color: #fff; }
+    .key[data-state="present"] { background: var(--present); color: #fff; }
+    .key[data-state="absent"] { background: var(--absent); color: #fff; }
+  </style>
+</head>
+<body>
+  <header>WEEBDLE</header>
+  <div id="game-container">
+    <div id="hint-card">
+      <img id="anime-poster" src="" alt="Poster" />
+      <div id="anime-meta">
+        <div><strong>Aired Year:</strong> <span id="meta-year">Loading...</span></div>
+        <div><strong>MAL Rank:</strong> <span id="meta-rank">-</span></div>
+        <div><strong>Genres:</strong> <span id="meta-genres">-</span></div>
+      </div>
+    </div>
+    <div id="board"></div>
+    <div id="keyboard"></div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
