@@ -1,131 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WEEBDLE - The Anime Wordle</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEEBDLE — The Daily Anime Guessing Game</title>
   <style>
     :root {
-      --bg: #ffffff;
-      --text: #1a1a1b;
-      --border: #d3d6da;
-      --correct: #6aaa64;
-      --present: #c9b458;
-      --absent: #787c7e;
-      --key-bg: #d3d6da;
+      --bg-color: #121213;
+      --card-bg: #1a1a1b;
+      --border-color: #3a3a3c;
+      --text-main: #ffffff;
+      --text-sub: #818384;
+      --green: #538d4e;
+      --yellow: #b59f3b;
+      --gray: #3a3a3c;
       --font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
     }
-    [data-theme="dark"] {
-      --bg: #121213;
-      --text: #ffffff;
-      --border: #3a3a3c;
-      --correct: #538d4e;
-      --present: #b59f3b;
-      --absent: #3a3a3c;
-      --key-bg: #818384;
-    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg);
-      color: var(--text);
+      background-color: var(--bg-color);
+      color: var(--text-main);
       font-family: var(--font-family);
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
-      overflow-x: hidden;
+      min-height: 100vh;
+      padding: 10px;
     }
+
     header {
       width: 100%;
-      max-width: 500px;
-      border-bottom: 1px solid var(--border);
+      max-width: 800px;
       text-align: center;
-      padding: 10px 0;
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
+      letter-spacing: 4px;
+      font-size: 26px;
+      font-weight: 800;
     }
-    #game-container {
+
+    #status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .search-container {
+      position: relative;
       width: 100%;
       max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-grow: 1;
-      justify-content: space-between;
-      padding: 10px;
+      margin: 20px 0;
     }
-    #board {
-      display: grid;
-      grid-gap: 5px;
-      margin: auto 0;
+
+    input#guess-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
     }
-    .row { display: flex; gap: 5px; }
-    .tile {
-      width: 52px;
-      height: 52px;
-      border: 2px solid var(--border);
-      display: flex;
+    input#guess-input:focus { border-color: #565758; }
+
+    .dropdown {
+      position: absolute;
+      top: 105%;
+      left: 0;
+      right: 0;
+      background: #181819;
+      border: 1px solid var(--border-color);
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+    }
+
+    .dropdown div {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 1px solid #272729;
+    }
+    .dropdown div:hover { background-color: #272729; }
+
+    .board-container {
+      width: 100%;
+      max-width: 900px;
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 6px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--text-sub);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding-bottom: 8px;
+    }
+
+    td {
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-color);
+      height: 75px;
+      min-width: 80px;
+      font-weight: 700;
+      border-radius: 4px;
+      vertical-align: middle;
+      padding: 6px;
+    }
+
+    .poster-cell img {
+      width: 48px;
+      height: 68px;
+      object-fit: cover;
+      border-radius: 2px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .correct { background-color: var(--green) !important; border-color: var(--green) !important; }
+    .partial { background-color: var(--yellow) !important; border-color: var(--yellow) !important; }
+    .wrong { background-color: var(--gray) !important; border-color: var(--gray) !important; }
+
+    #game-over-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
       justify-content: center;
       align-items: center;
-      font-size: 24px;
-      font-weight: bold;
-      text-transform: uppercase;
+      z-index: 99;
     }
-    .tile[data-state="correct"] { background: var(--correct); color: white; border-color: var(--correct); }
-    .tile[data-state="present"] { background: var(--present); color: white; border-color: var(--present); }
-    .tile[data-state="absent"] { background: var(--absent); color: white; border-color: var(--absent); }
 
-    /* Target Hints / Stats Dropdown */
-    #hint-card {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 10px;
-      margin-bottom: 8px;
-      font-size: 13px;
-      display: flex;
-      gap: 12px;
+    .modal-content {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      max-width: 400px;
+      width: 90%;
     }
-    #hint-card img { width: 60px; height: 85px; object-fit: cover; border-radius: 4px; filter: blur(8px); transition: filter 0.3s; }
-    #hint-card img.revealed { filter: blur(0); }
 
-    #keyboard { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 6px; }
-    .kb-row { display: flex; justify-content: center; gap: 4px; }
-    .key {
-      background: var(--key-bg);
-      color: var(--text);
-      border-radius: 4px;
+    .modal-content h2 { margin-bottom: 12px; }
+    .modal-content button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--green);
+      color: #fff;
       border: none;
-      height: 50px;
-      flex: 1;
       font-weight: bold;
       cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      border-radius: 4px;
     }
-    .key.wide { flex: 1.5; font-size: 12px; }
-    .key[data-state="correct"] { background: var(--correct); color: #fff; }
-    .key[data-state="present"] { background: var(--present); color: #fff; }
-    .key[data-state="absent"] { background: var(--absent); color: #fff; }
   </style>
 </head>
 <body>
+
   <header>WEEBDLE</header>
-  <div id="game-container">
-    <div id="hint-card">
-      <img id="anime-poster" src="" alt="Poster" />
-      <div id="anime-meta">
-        <div><strong>Aired Year:</strong> <span id="meta-year">Loading...</span></div>
-        <div><strong>MAL Rank:</strong> <span id="meta-rank">-</span></div>
-        <div><strong>Genres:</strong> <span id="meta-genres">-</span></div>
-      </div>
-    </div>
-    <div id="board"></div>
-    <div id="keyboard"></div>
+  <div id="status">Loading anime dataset from 2010–2026...</div>
+
+  <div class="search-container">
+    <input type="text" id="guess-input" placeholder="Guess an anime (e.g. Jujutsu Kaisen)..." autocomplete="off" disabled />
+    <div id="dropdown" class="dropdown"></div>
   </div>
+
+  <div class="board-container">
+    <table id="game-board">
+      <thead>
+        <tr>
+          <th>Poster</th>
+          <th>Title</th>
+          <th>Year</th>
+          <th>Rank / Score</th>
+          <th>Main Genres</th>
+        </tr>
+      </thead>
+      <tbody id="guesses-body"></tbody>
+    </table>
+  </div>
+
+  <div id="game-over-modal">
+    <div class="modal-content">
+      <h2 id="modal-title"></h2>
+      <p id="modal-desc"></p>
+      <button onclick="location.reload()">Play Again</button>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
