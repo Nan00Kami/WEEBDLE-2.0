@@ -2,470 +2,154 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Weebdle - Daily Anime Guessing Game</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weebdle - Anime Guessing Game</title>
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #ffffff;
-      --text: #1a1a1b;
-      --text-sub: #787c7e;
-      --border: #d3d6da;
-      --correct: #6aaa64;
-      --partial: #c9b458;
-      --wrong: #787c7e;
-      --highlight: #f3f4f6;
-      --font-serif: 'Playfair Display', Georgia, serif;
-      --font-sans: 'Libre Franklin', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --bg: #121214;
+      --card-bg: #1e1e24;
+      --text: #f3f3f6;
+      --accent: #ff4a6e;
+      --correct: #2e7d32;
+      --incorrect: #c62828;
+      --partial: #f57f17;
+      --higher-lower: #1565c0;
     }
-
-    [data-theme="dark"] {
-      --bg: #121213;
-      --surface: #1a1a1b;
-      --text: #ffffff;
-      --text-sub: #818384;
-      --border: #3a3a3c;
-      --correct: #538d4e;
-      --partial: #b59f3b;
-      --wrong: #3a3a3c;
-      --highlight: #272729;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      font-family: var(--font-sans);
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    header {
-      width: 100%;
-      max-width: 900px;
-      border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      margin: 0;
+      padding: 2rem 1rem;
     }
 
     h1 {
-      font-family: var(--font-serif);
-      font-size: 32px;
-      letter-spacing: -0.5px;
-      font-weight: 700;
-      text-align: center;
-      flex: 1;
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    main {
-      width: 100%;
-      max-width: 880px;
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .sub-heading {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-sub);
+      margin-bottom: 0.5rem;
+      color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 24px;
+      letter-spacing: 2px;
     }
 
-    .search-wrapper {
-      position: relative;
+    p.subtitle {
+      color: #8c8c99;
+      margin-bottom: 2rem;
+    }
+
+    .input-section {
+      display: flex;
+      gap: 0.5rem;
       width: 100%;
-      max-width: 480px;
-      margin-bottom: 30px;
+      max-width: 500px;
+      margin-bottom: 2rem;
     }
 
     input[type="text"] {
-      width: 100%;
-      padding: 14px 18px;
-      font-size: 16px;
-      font-family: var(--font-sans);
-      border: 2px solid var(--border);
-      border-radius: 4px;
-      background: var(--surface);
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: var(--card-bg);
       color: var(--text);
+      font-size: 1rem;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     input[type="text"]:focus {
-      border-color: var(--text);
+      border-color: var(--accent);
     }
 
-    .autocomplete-list {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      max-height: 240px;
-      overflow-y: auto;
-      z-index: 50;
-      list-style: none;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    }
-
-    .autocomplete-list li {
-      padding: 10px 14px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .autocomplete-list li:hover {
-      background-color: var(--highlight);
-    }
-
-    .autocomplete-list img {
-      width: 28px;
-      height: 38px;
-      object-fit: cover;
-      border-radius: 2px;
-    }
-
-    .board-container {
-      width: 100%;
-      overflow-x: auto;
-      padding-bottom: 16px;
-    }
-
-    /* Grid Template: Poster (64px), Title (2fr), Year (1fr), Format (1fr), Source (1fr), Genres (2fr), Episodes (1fr) */
-    .grid-header, .guess-row {
-      display: grid;
-      grid-template-columns: 64px 2fr 1fr 1fr 1fr 2fr 1fr;
-      gap: 6px;
-      min-width: 720px;
-      margin-bottom: 6px;
-    }
-
-    .grid-header span {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      text-align: center;
-      color: var(--text-sub);
-      padding-bottom: 4px;
-    }
-
-    .tile {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 64px;
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-      padding: 6px;
-      border-radius: 3px;
-      color: #ffffff;
-      line-height: 1.2;
-      animation: flipIn 0.5s ease-in forwards;
-    }
-
-    .tile-poster {
-      padding: 0;
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid var(--border);
-    }
-
-    .tile-poster img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .tile.correct { background-color: var(--correct); }
-    .tile.partial { background-color: var(--partial); }
-    .tile.wrong { background-color: var(--wrong); }
-
-    .indicator {
-      font-size: 11px;
-      font-weight: 800;
-      margin-top: 3px;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-    }
-
-    .modal {
-      background: var(--surface);
-      padding: 30px;
-      border-radius: 8px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-    }
-
-    .modal img {
-      width: 110px;
-      height: 155px;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-bottom: 16px;
-    }
-
-    .modal h2 {
-      font-family: var(--font-serif);
-      font-size: 26px;
-      margin-bottom: 8px;
-    }
-
-    .modal p {
-      font-size: 15px;
-      color: var(--text-sub);
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      background: var(--correct);
-      color: #fff;
+    button {
+      padding: 0.75rem 1.5rem;
       border: none;
-      padding: 10px 24px;
-      font-weight: 700;
-      border-radius: 4px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
       cursor: pointer;
+      transition: opacity 0.2s;
     }
 
-    @keyframes flipIn {
-      0% { transform: rotateX(90deg); opacity: 0; }
-      100% { transform: rotateX(0deg); opacity: 1; }
+    button:hover {
+      opacity: 0.9;
     }
+
+    #status-msg {
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .table-container {
+      width: 100%;
+      max-width: 900px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0.5rem;
+      text-align: center;
+    }
+
+    th {
+      padding: 0.75rem 0.5rem;
+      background: #18181f;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    td {
+      padding: 1rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      background-color: var(--card-bg);
+    }
+
+    .cell-correct { background-color: var(--correct) !important; }
+    .cell-incorrect { background-color: var(--incorrect) !important; }
+    .cell-partial { background-color: var(--partial) !important; }
+    .cell-higher { background-color: var(--higher-lower) !important; }
+    .cell-lower { background-color: var(--higher-lower) !important; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div style="width: 24px;"></div>
-    <h1>WEEBDLE</h1>
-    <button class="icon-btn" id="themeToggle" aria-label="Toggle Theme">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-    </button>
-  </header>
+  <h1>WEEBDLE</h1>
+  <p class="subtitle">Guess the mystery anime from the dataset</p>
 
-  <main>
-    <div class="sub-heading">Guess the mystery anime (2010 – 2026)</div>
-
-    <div class="search-wrapper">
-      <input type="text" id="animeInput" placeholder="Search anime title..." autocomplete="off" />
-      <ul class="autocomplete-list" id="autoList"></ul>
-    </div>
-
-    <div class="board-container">
-      <div class="grid-header">
-        <span>Poster</span>
-        <span>Title</span>
-        <span>Year</span>
-        <span>Format</span>
-        <span>Source</span>
-        <span>Genres</span>
-        <span>Episodes</span>
-      </div>
-      <div id="guessesList"></div>
-    </div>
-  </main>
-
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <img id="modalImg" src="" alt="Mystery Anime Poster" />
-      <h2 id="modalTitle">Splendid!</h2>
-      <p id="modalMsg"></p>
-      <button class="btn" onclick="document.getElementById('modalOverlay').style.display='none'">View Board</button>
-    </div>
+  <div class="input-section">
+    <input type="text" id="anime-input" list="anime-options" placeholder="Search anime title..." autocomplete="off" />
+    <datalist id="anime-options"></datalist>
+    <button id="guess-btn">Submit</button>
   </div>
 
-  <script>
-    // Embedded dataset spanning 2010-2026 (No API or scraping needed)
-    const ANIME_DB = [
-      { id: 1, title: "Attack on Titan", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-73PEFnOiVUbt.png", year: 2013, format: "TV", source: "Manga", genres: ["Action", "Drama", "Fantasy"], episodes: 89 },
-      { id: 2, title: "Demon Slayer: Kimetsu no Yaiba", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101922-PEn1CTyeNhKt.png", year: 2019, format: "TV", source: "Manga", genres: ["Action", "Fantasy", "Supernatural"], episodes: 55 },
-      { id: 3, title: "Jujutsu Kaisen", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113415-bbBWj4pEFArM.jpg", year: 2020, format: "TV", source: "Manga", genres: ["Action", "Fantasy", "Supernatural"], episodes: 47 },
-      { id: 4, title: "Steins;Gate", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9253-7pdcVzQSkpKq.png", year: 2011, format: "TV", source: "Visual Novel", genres: ["Drama", "Sci-Fi", "Suspense"], episodes: 24 },
-      { id: 5, title: "Frieren: Beyond Journey's End", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-n1HJZcLueDzC.jpg", year: 2023, format: "TV", source: "Manga", genres: ["Adventure", "Drama", "Fantasy"], episodes: 28 },
-      { id: 6, title: "My Hero Academia", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-oLH3bGIfltBp.jpg", year: 2016, format: "TV", source: "Manga", genres: ["Action", "Adventure", "Sci-Fi"], episodes: 138 },
-      { id: 7, title: "Hunter x Hunter (2011)", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11061-sIpBprNR2AOx.png", year: 2011, format: "TV", source: "Manga", genres: ["Action", "Adventure", "Fantasy"], episodes: 148 },
-      { id: 8, title: "One Punch Man", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21087-UV2tu6exnvNm.jpg", year: 2015, format: "TV", source: "Web Manga", genres: ["Action", "Comedy", "Sci-Fi"], episodes: 24 },
-      { id: 9, title: "Chainsaw Man", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx127230-FloXFsyoFhkP.png", year: 2022, format: "TV", source: "Manga", genres: ["Action", "Drama", "Supernatural"], episodes: 12 },
-      { id: 10, title: "Your Name.", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21519-XIr3Pecrw1t4.png", year: 2016, format: "Movie", source: "Original", genres: ["Drama", "Romance", "Supernatural"], episodes: 1 },
-      { id: 11, title: "A Silent Voice", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20954-UMb6ClB7tblT.jpg", year: 2016, format: "Movie", source: "Manga", genres: ["Drama", "Romance", "Slice of Life"], episodes: 1 },
-      { id: 12, title: "Cyberpunk: Edgerunners", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx120377-p4RQAwbwgztr.jpg", year: 2022, format: "ONA", source: "Video Game", genres: ["Action", "Sci-Fi"], episodes: 10 },
-      { id: 13, title: "Vinland Saga", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-4xRjJb80cO24.jpg", year: 2019, format: "TV", source: "Manga", genres: ["Action", "Adventure", "Drama"], episodes: 48 },
-      { id: 14, title: "Mob Psycho 100", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-7K5vO02Kkg5M.jpg", year: 2016, format: "TV", source: "Web Manga", genres: ["Action", "Comedy", "Supernatural"], episodes: 37 },
-      { id: 15, title: "Violet Evergarden", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21827-10fJdoDuW4Ta.png", year: 2018, format: "TV", source: "Light Novel", genres: ["Drama", "Fantasy", "Slice of Life"], episodes: 13 },
-      { id: 16, title: "KonoSuba: God's Blessing on This Wonderful World!", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21202-kH0flB5Ua3bv.jpg", year: 2016, format: "TV", source: "Light Novel", genres: ["Adventure", "Comedy", "Fantasy"], episodes: 31 },
-      { id: 17, title: "Haikyu!!", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-YvYQj26Z8mQz.jpg", year: 2014, format: "TV", source: "Manga", genres: ["Comedy", "Drama", "Sports"], episodes: 85 },
-      { id: 18, title: "Re:ZERO -Starting Life in Another World-", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21355-qDwhp8nZ097U.png", year: 2016, format: "TV", source: "Light Novel", genres: ["Action", "Drama", "Fantasy"], episodes: 50 },
-      { id: 19, title: "Sword Art Online", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11757-lJDyPtxTXrA1.png", year: 2012, format: "TV", source: "Light Novel", genres: ["Action", "Adventure", "Fantasy"], episodes: 96 },
-      { id: 20, title: "Tokyo Ghoul", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20605-ffHNQWbDNpLL.jpg", year: 2014, format: "TV", source: "Manga", genres: ["Action", "Horror", "Mystery"], episodes: 48 },
-      { id: 21, title: "Spy x Family", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140960-vNeGFiDdpmdA.jpg", year: 2022, format: "TV", source: "Manga", genres: ["Action", "Comedy"], episodes: 37 },
-      { id: 22, title: "Bocchi the Rock!", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx130003-5VG5embg88Es.png", year: 2022, format: "TV", source: "Manga", genres: ["Comedy", "Music", "Slice of Life"], episodes: 12 },
-      { id: 23, title: "Solo Leveling", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151807-31Gv5vA54c7v.jpg", year: 2024, format: "TV", source: "Web Manga", genres: ["Action", "Adventure", "Fantasy"], episodes: 12 },
-      { id: 24, title: "Dungeon Meshi", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153518-E1xM93uMhCgA.jpg", year: 2024, format: "TV", source: "Manga", genres: ["Adventure", "Comedy", "Fantasy"], episodes: 24 },
-      { id: 25, title: "Kaiju No. 8", image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-E0L2mUa8U0kE.jpg", year: 2024, format: "TV", source: "Manga", genres: ["Action", "Sci-Fi"], episodes: 12 }
-    ];
+  <div id="status-msg"></div>
 
-    // Pick deterministic daily target using UTC date
-    const epoch = new Date("2024-01-01").getTime();
-    const now = Date.now();
-    const dayIndex = Math.floor((now - epoch) / 86400000);
-    const TARGET = ANIME_DB[dayIndex % ANIME_DB.length];
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Release Year</th>
+          <th>Episodes</th>
+          <th>Genres</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="guess-list"></tbody>
+    </table>
+  </div>
 
-    let guesses = [];
-    let isGameOver = false;
-
-    const input = document.getElementById("animeInput");
-    const autoList = document.getElementById("autoList");
-    const guessesList = document.getElementById("guessesList");
-
-    // Search Autocomplete
-    input.addEventListener("input", () => {
-      const val = input.value.trim().toLowerCase();
-      autoList.innerHTML = "";
-      if (!val) {
-        autoList.style.display = "none";
-        return;
-      }
-
-      const matches = ANIME_DB.filter(a => 
-        a.title.toLowerCase().includes(val) && !guesses.includes(a.title)
-      ).slice(0, 6);
-
-      if (matches.length > 0) {
-        matches.forEach(item => {
-          const li = document.createElement("li");
-          li.innerHTML = `<img src="${item.image}" alt=""> <span>${item.title}</span>`;
-          li.onclick = () => submitGuess(item);
-          autoList.appendChild(li);
-        });
-        autoList.style.display = "block";
-      } else {
-        autoList.style.display = "none";
-      }
-    });
-
-    // Comparison & Tile Generator
-    function submitGuess(anime) {
-      if (isGameOver) return;
-
-      guesses.push(anime.title);
-      input.value = "";
-      autoList.style.display = "none";
-
-      const row = document.createElement("div");
-      row.className = "guess-row";
-
-      // 1. Poster Tile
-      const posterTile = document.createElement("div");
-      posterTile.className = "tile tile-poster";
-      posterTile.innerHTML = `<img src="${anime.image}" alt="${anime.title}" />`;
-
-      // 2. Title
-      const titleTile = createTile(anime.title, anime.title === TARGET.title ? "correct" : "wrong");
-
-      // 3. Year
-      let yearClass = anime.year === TARGET.year ? "correct" : "wrong";
-      let yearInd = anime.year < TARGET.year ? "↑" : anime.year > TARGET.year ? "↓" : "";
-      const yearTile = createTile(anime.year, yearClass, yearInd);
-
-      // 4. Format
-      const formatTile = createTile(anime.format, anime.format === TARGET.format ? "correct" : "wrong");
-
-      // 5. Source
-      const sourceTile = createTile(anime.source, anime.source === TARGET.source ? "correct" : "wrong");
-
-      // 6. Genres
-      const matched = anime.genres.filter(g => TARGET.genres.includes(g));
-      let genreClass = "wrong";
-      if (matched.length === TARGET.genres.length && anime.genres.length === TARGET.genres.length) {
-        genreClass = "correct";
-      } else if (matched.length > 0) {
-        genreClass = "partial";
-      }
-      const genreTile = createTile(anime.genres.join(", "), genreClass);
-
-      // 7. Episodes
-      let epClass = anime.episodes === TARGET.episodes ? "correct" : "wrong";
-      let epInd = anime.episodes < TARGET.episodes ? "↑" : anime.episodes > TARGET.episodes ? "↓" : "";
-      const epTile = createTile(anime.episodes, epClass, epInd);
-
-      row.append(posterTile, titleTile, yearTile, formatTile, sourceTile, genreTile, epTile);
-      guessesList.prepend(row);
-
-      if (anime.title === TARGET.title) {
-        isGameOver = true;
-        input.disabled = true;
-        showModal(guesses.length);
-      }
-    }
-
-    function createTile(text, status, indicator = "") {
-      const tile = document.createElement("div");
-      tile.className = `tile ${status}`;
-      tile.innerHTML = `<span>${text}</span>` + (indicator ? `<span class="indicator">${indicator}</span>` : "");
-      return tile;
-    }
-
-    function showModal(count) {
-      setTimeout(() => {
-        document.getElementById("modalImg").src = TARGET.image;
-        document.getElementById("modalMsg").innerText = `You uncovered ${TARGET.title} in ${count} ${count === 1 ? 'guess' : 'guesses'}!`;
-        document.getElementById("modalOverlay").style.display = "flex";
-      }, 500);
-    }
-
-    // Light/Dark Theme Toggle
-    document.getElementById("themeToggle").onclick = () => {
-      const isDark = document.body.getAttribute("data-theme") === "dark";
-      document.body.setAttribute("data-theme", isDark ? "light" : "dark");
-    };
-
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest('.search-wrapper')) autoList.style.display = "none";
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
