@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Prevents MAL CDN from blocking image requests -->
   <meta name="referrer" content="no-referrer" />
-  <title>WEEBDLE — The Daily Anime Guessing Game</title>
+  <title>ANIDLE — The Daily Anime Guessing Game</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
       <div class="header-left">
         <button id="help-btn" class="icon-btn" aria-label="Help">?</button>
       </div>
-      <h1 class="title">WEEBDLE</h1>
+      <h1 class="title">ANIDLE</h1>
       <div class="header-right">
         <button id="stats-btn" class="icon-btn" aria-label="Stats">📊</button>
       </div>
@@ -68,7 +68,7 @@
     </div>
   </div>
 
-  <!-- Critical: Load master catalog FIRST so app.js can access MASTER_ANIME_DATA -->
+  <!-- Master catalog loads first -->
   <script src="animeData.js"></script>
   <script src="app.js"></script>
 </body>
