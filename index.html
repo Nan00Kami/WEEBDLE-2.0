@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weebdle - Daily Anime Guessing Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --text: #1a1a1b;
+      --text-sub: #787c7e;
+      --border: #d3d6da;
+      --correct: #6aaa64;
+      --partial: #c9b458;
+      --wrong: #787c7e;
+      --tile-empty: #ffffff;
+      --highlight: #f3f4f6;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Libre Franklin', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121213;
+      --surface: #1a1a1b;
+      --text: #ffffff;
+      --text-sub: #818384;
+      --border: #3a3a3c;
+      --correct: #538d4e;
+      --partial: #b59f3b;
+      --wrong: #3a3a3c;
+      --tile-empty: #121213;
+      --highlight: #272729;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    /* NYT Header */
+    header {
+      width: 100%;
+      max-width: 900px;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button.icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+      text-align: center;
+      flex: 1;
+    }
+
+    /* Container */
+    main {
+      width: 100%;
+      max-width: 860px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sub-heading {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    /* Search & Input */
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 25px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-family: var(--font-sans);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--text);
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0 0 4px 4px;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 10;
+      list-style: none;
+      display: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .autocomplete-list li {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .autocomplete-list li:hover {
+      background-color: var(--highlight);
+    }
+
+    /* Table Board */
+    .board-container {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 20px;
+    }
+
+    .grid-header, .guess-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr 1.1fr 2fr 1fr;
+      gap: 6px;
+      min-width: 700px;
+      margin-bottom: 6px;
+    }
+
+    .grid-header span {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+      color: var(--text-sub);
+      padding-bottom: 4px;
+    }
+
+    .tile {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 56px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px;
+      border-radius: 2px;
+      color: #ffffff;
+      line-height: 1.2;
+      position: relative;
+      animation: flipIn 0.5s ease-in forwards;
+    }
+
+    .tile.correct { background-color: var(--correct); border: 1px solid var(--correct); }
+    .tile.partial { background-color: var(--partial); border: 1px solid var(--partial); }
+    .tile.wrong { background-color: var(--wrong); border: 1px solid var(--wrong); }
+
+    .indicator {
+      font-size: 10px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    /* Win/Loss Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal {
+      background: var(--surface);
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .modal h2 {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      margin-bottom: 12px;
+    }
+
+    .modal p {
+      font-size: 15px;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: var(--correct);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes flipIn {
+      0% { transform: rotateX(90deg); opacity: 0; }
+      100% { transform: rotateX(0deg); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="width: 24px;"></div>
+    <h1>WEEBDLE</h1>
+    <div class="header-icons">
+      <button class="icon-btn" id="themeToggle" title="Toggle Theme" aria-label="Toggle Theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="sub-heading">Guess today's mystery anime</div>
+
+    <div class="search-wrapper">
+      <input type="text" id="animeInput" placeholder="Type anime title..." autocomplete="off" />
+      <ul class="autocomplete-list" id="autoList"></ul>
+    </div>
+
+    <div class="board-container">
+      <div class="grid-header">
+        <span>Title</span>
+        <span>Year</span>
+        <span>Format</span>
+        <span>Studio</span>
+        <span>Source</span>
+        <span>Genres</span>
+        <span>Episodes</span>
+      </div>
+      <div id="guessesList"></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2 id="modalTitle">Brilliant!</h2>
+      <p id="modalMsg">You found today's anime in 3 tries.</p>
+      <button class="btn" onclick="document.getElementById('modalOverlay').style.display='none'">View Grid</button>
+    </div>
+  </div>
+
+  <script>
+    // 1. Anime Dataset
+    const ANIME_DB = [
+      { title: "Death Note", year: 2006, format: "TV", studio: "Madhouse", source: "Manga", genres: ["Mystery", "Supernatural", "Suspense"], episodes: 37 },
+      { title: "Fullmetal Alchemist: Brotherhood", year: 2009, format: "TV", studio: "Bones", source: "Manga", genres: ["Action", "Adventure", "Fantasy"], episodes: 64 },
+      { title: "Attack on Titan", year: 2013, format: "TV", studio: "Wit Studio", source: "Manga", genres: ["Action", "Drama", "Suspense"], episodes: 89 },
+      { title: "Steins;Gate", year: 2011, format: "TV", studio: "White Fox", source: "Visual Novel", genres: ["Drama", "Sci-Fi", "Suspense"], episodes: 24 },
+      { title: "Spirited Away", year: 2001, format: "Movie", studio: "Studio Ghibli", source: "Original", genres: ["Adventure", "Supernatural"], episodes: 1 },
+      { title: "Demon Slayer", year: 2019, format: "TV", studio: "ufotable", source: "Manga", genres: ["Action", "Supernatural"], episodes: 55 },
+      { title: "Jujutsu Kaisen", year: 2020, format: "TV", studio: "MAPPA", source: "Manga", genres: ["Action", "Fantasy"], episodes: 47 },
+      { title: "Neon Genesis Evangelion", year: 1995, format: "TV", studio: "Gainax", source: "Original", genres: ["Mecha", "Sci-Fi", "Psychological"], episodes: 26 },
+      { title: "Cowboy Bebop", year: 1998, format: "TV", studio: "Sunrise", source: "Original", genres: ["Action", "Sci-Fi"], episodes: 26 },
+      { title: "Your Name.", year: 2016, format: "Movie", studio: "CoMix Wave Films", source: "Original", genres: ["Drama", "Romance", "Supernatural"], episodes: 1 },
+      { title: "Cyberpunk: Edgerunners", year: 2022, format: "ONA", studio: "Trigger", source: "Video Game", genres: ["Action", "Sci-Fi"], episodes: 10 },
+      { title: "Frieren: Beyond Journey's End", year: 2023, format: "TV", studio: "Madhouse", source: "Manga", genres: ["Adventure", "Drama", "Fantasy"], episodes: 28 },
+      { title: "Chainsaw Man", year: 2022, format: "TV", studio: "MAPPA", source: "Manga", genres: ["Action", "Supernatural"], episodes: 12 },
+      { title: "Vinland Saga", year: 2019, format: "TV", studio: "Wit Studio", source: "Manga", genres: ["Action", "Adventure", "Drama"], episodes: 48 },
+      { title: "Code Geass", year: 2006, format: "TV", studio: "Sunrise", source: "Original", genres: ["Action", "Mecha", "Drama"], episodes: 50 }
+    ];
+
+    // 2. Deterministic Daily Target Logic (Matches NYT's 1-puzzle-a-day)
+    function getDailyTarget() {
+      const epoch = new Date(2024, 0, 1).getTime();
+      const now = new Date().getTime();
+      const dayIndex = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+      return ANIME_DB[dayIndex % ANIME_DB.length];
+    }
+
+    const TARGET = getDailyTarget();
+    let guesses = [];
+    let isGameOver = false;
+
+    // Elements
+    const input = document.getElementById("animeInput");
+    const autoList = document.getElementById("autoList");
+    const guessesList = document.getElementById("guessesList");
+
+    // 3. Autocomplete UI
+    input.addEventListener("input", () => {
+      const val = input.value.trim().toLowerCase();
+      autoList.innerHTML = "";
+      if (!val) {
+        autoList.style.display = "none";
+        return;
+      }
+
+      const matches = ANIME_DB.filter(a => 
+        a.title.toLowerCase().includes(val) && !guesses.includes(a.title)
+      );
+
+      if (matches.length > 0) {
+        matches.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item.title;
+          li.onclick = () => submitGuess(item);
+          autoList.appendChild(li);
+        });
+        autoList.style.display = "block";
+      } else {
+        autoList.style.display = "none";
+      }
+    });
+
+    // 4. Comparison Logic
+    function submitGuess(anime) {
+      if (isGameOver) return;
+
+      guesses.push(anime.title);
+      input.value = "";
+      autoList.style.display = "none";
+
+      const row = document.createElement("div");
+      row.className = "guess-row";
+
+      // Title
+      const tileTitle = createTile(anime.title, anime.title === TARGET.title ? "correct" : "wrong");
+
+      // Year
+      let yearClass = anime.year === TARGET.year ? "correct" : "wrong";
+      let yearIndicator = anime.year < TARGET.year ? "↑" : anime.year > TARGET.year ? "↓" : "";
+      const tileYear = createTile(anime.year, yearClass, yearIndicator);
+
+      // Format
+      const tileFormat = createTile(anime.format, anime.format === TARGET.format ? "correct" : "wrong");
+
+      // Studio
+      const tileStudio = createTile(anime.studio, anime.studio === TARGET.studio ? "correct" : "wrong");
+
+      // Source
+      const tileSource = createTile(anime.source, anime.source === TARGET.source ? "correct" : "wrong");
+
+      // Genres
+      const matchedGenres = anime.genres.filter(g => TARGET.genres.includes(g));
+      let genreClass = "wrong";
+      if (matchedGenres.length === TARGET.genres.length && anime.genres.length === TARGET.genres.length) {
+        genreClass = "correct";
+      } else if (matchedGenres.length > 0) {
+        genreClass = "partial";
+      }
+      const tileGenres = createTile(anime.genres.join(", "), genreClass);
+
+      // Episodes
+      let epClass = anime.episodes === TARGET.episodes ? "correct" : "wrong";
+      let epIndicator = anime.episodes < TARGET.episodes ? "↑" : anime.episodes > TARGET.episodes ? "↓" : "";
+      const tileEpisodes = createTile(anime.episodes, epClass, epIndicator);
+
+      // Append row
+      row.append(tileTitle, tileYear, tileFormat, tileStudio, tileSource, tileGenres, tileEpisodes);
+      guessesList.prepend(row);
+
+      // Win Condition
+      if (anime.title === TARGET.title) {
+        isGameOver = true;
+        input.disabled = true;
+        showModal(true, guesses.length);
+      }
+    }
+
+    function createTile(text, statusClass, indicator = "") {
+      const tile = document.createElement("div");
+      tile.className = `tile ${statusClass}`;
+      tile.innerHTML = `<span>${text}</span>` + (indicator ? `<span class="indicator">${indicator}</span>` : "");
+      return tile;
+    }
+
+    function showModal(won, count) {
+      setTimeout(() => {
+        document.getElementById("modalOverlay").style.display = "flex";
+        document.getElementById("modalTitle").innerText = won ? "Splendid!" : "Game Over";
+        document.getElementById("modalMsg").innerText = won 
+          ? `You guessed ${TARGET.title} in ${count} ${count === 1 ? 'try' : 'tries'}!` 
+          : `The correct anime was ${TARGET.title}.`;
+      }, 500);
+    }
+
+    // Theme Toggle
+    document.getElementById("themeToggle").onclick = () => {
+      const isDark = document.body.getAttribute("data-theme") === "dark";
+      document.body.setAttribute("data-theme", isDark ? "light" : "dark");
+    };
+
+    // Close autocomplete on external click
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest('.search-wrapper')) {
+        autoList.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
