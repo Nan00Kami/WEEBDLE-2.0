@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="referrer" content="no-referrer" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Prevents MAL CDN from blocking image requests -->
+  <meta name="referrer" content="no-referrer" />
   <title>WEEBDLE — The Daily Anime Guessing Game</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +24,7 @@
     </header>
 
     <div class="instruction-banner">
-      Guess the secret anime from 2010–2026. Each guess reveals directional clues.
+      Guess today's mystery anime. Green means exact match; yellow indicates partial genre match.
     </div>
 
     <!-- Input Section -->
@@ -32,7 +33,7 @@
         <input 
           type="text" 
           id="anime-input" 
-          placeholder="Search anime (e.g. Jujutsu Kaisen, Steins;Gate)..." 
+          placeholder="Type an anime title (e.g. Steins;Gate, Naruto)..." 
           autocomplete="off" 
         />
         <ul id="autocomplete-list" class="autocomplete-dropdown hidden"></ul>
@@ -67,6 +68,8 @@
     </div>
   </div>
 
+  <!-- Critical: Load master catalog FIRST so app.js can access MASTER_ANIME_DATA -->
+  <script src="animeData.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
