@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Prevents MAL CDN from blocking image requests -->
+  <!-- Prevents CDN blocking image requests -->
   <meta name="referrer" content="no-referrer" />
   <title>ANIDLE — The Daily Anime Guessing Game</title>
   <link rel="stylesheet" href="style.css" />
@@ -60,6 +60,17 @@
       <a href="privacy.html" style="color: var(--text-secondary); text-decoration: underline;">Privacy Policy</a>
     </footer>
 
+    <!-- Randomized Anime Quote Banner -->
+    <div id="quote-section" class="quote-card">
+      <div id="quote-image-window" class="quote-image-window">
+        <img id="quote-img" src="" alt="Anime Moment" />
+        <div class="quote-overlay">
+          <blockquote id="quote-text"></blockquote>
+          <cite id="quote-author"></cite>
+        </div>
+      </div>
+    </div>
+
     <!-- Win/Loss Overlay Modal -->
     <div id="game-modal" class="modal hidden">
       <div class="modal-content">
@@ -74,7 +85,6 @@
     </div>
   </div>
 
-  <!-- Master catalog loads first -->
   <script src="animeData.js"></script>
   <script src="app.js"></script>
 </body>
