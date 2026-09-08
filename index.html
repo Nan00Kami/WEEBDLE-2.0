@@ -83,8 +83,36 @@
         </div>
       </div>
     </div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-stats-modal" class="close-btn">&times;</button>
+        <h2>STATISTICS</h2>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span id="stat-played" class="stat-num">0</span>
+            <span class="stat-label">Played</span>
+          </div>
+          <div class="stat-box">
+            <span id="stat-points" class="stat-num">0</span>
+            <span class="stat-label">Points</span>
+          </div>
+          <div class="stat-box">
+            <span id="stat-streak" class="stat-num">0</span>
+            <span class="stat-label">Current Streak</span>
+          </div>
+          <div class="stat-box">
+            <span id="stat-max-streak" class="stat-num">0</span>
+            <span class="stat-label">Max Streak</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
+  <!-- Master catalog loads first -->
   <script src="animeData.js"></script>
   <script src="app.js"></script>
 </body>
