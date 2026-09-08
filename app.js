@@ -144,7 +144,7 @@ document.getElementById("close-modal").onclick = () => {
 
 // Share Button logic
 document.getElementById("share-btn").onclick = () => {
-  let shareText = `WEEBDLE - ${guesses.length}/${MAX_GUESSES}\n`;
+  let shareText = `ANIDLE - ${guesses.length}/${MAX_GUESSES}\n`;
   guesses.forEach(g => {
     const isMatch = g.id === targetAnime.id;
     shareText += isMatch ? "🟩🟩🟩🟩\n" : "⬛🟨⬛⬛\n";
