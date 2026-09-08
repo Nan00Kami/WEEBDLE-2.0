@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Prevents MAL CDN from blocking image requests -->
   <meta name="referrer" content="no-referrer" />
   <title>ANIDLE — The Daily Anime Guessing Game</title>
   <link rel="stylesheet" href="style.css" />
@@ -11,99 +12,63 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="page-layout">
-    <!-- Left Ad Banner Slot -->
-    <aside class="ad-sidebar ad-left">
-      <div class="ad-placeholder">
-        <span class="ad-label">Advertisement</span>
-        <!-- AdSense code will go here -->
+  <div class="app-container">
+    <header class="header">
+      <div class="header-left">
+        <button id="help-btn" class="icon-btn" aria-label="Help">?</button>
       </div>
-    </aside>
+      <h1 class="title">ANIDLE</h1>
+      <div class="header-right">
+        <button id="stats-btn" class="icon-btn" aria-label="Stats">📊</button>
+      </div>
+    </header>
 
-    <!-- Main Game Container -->
-    <main class="app-container">
-      <header class="header">
-        <div class="header-left">
-          <button id="help-btn" class="icon-btn" aria-label="Help">?</button>
+    <div class="instruction-banner">
+      Guess today's mystery anime. Green means exact match; yellow indicates partial genre match.
+    </div>
+
+    <!-- Input Section -->
+    <div class="search-section">
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          id="anime-input" 
+          placeholder="Type an anime title (e.g. Steins;Gate, Naruto)..." 
+          autocomplete="off" 
+        />
+        <ul id="autocomplete-list" class="autocomplete-dropdown hidden"></ul>
+      </div>
+    </div>
+
+    <!-- Guess Table / Grid -->
+    <div class="grid-container">
+      <div class="grid-header">
+        <div>Poster</div>
+        <div>Title</div>
+        <div>Year</div>
+        <div>MAL Rank</div>
+        <div>Genres</div>
+      </div>
+      <div id="guesses-container" class="guesses-list">
+        <!-- Rows injected dynamically via app.js -->
+      </div>
+    </div>
+
+    <!-- Win/Loss Overlay Modal -->
+    <div id="game-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-modal" class="close-btn">&times;</button>
+        <h2 id="modal-title">Victory!</h2>
+        <div id="modal-poster-wrap"></div>
+        <p id="modal-desc"></p>
+        <div class="share-box">
+          <button id="share-btn">Share Result 📋</button>
         </div>
-        <h1 class="title">ANIDLE</h1>
-        <div class="header-right">
-          <button id="stats-btn" class="icon-btn" aria-label="Stats">📊</button>
-        </div>
-      </header>
-
-      <div class="instruction-banner">
-        Guess today's mystery anime. Green means exact match; yellow indicates partial genre match.
-      </div>
-
-      <div class="search-section">
-        <div class="input-wrapper">
-          <input 
-            type="text" 
-            id="anime-input" 
-            placeholder="Type an anime title (e.g. Steins;Gate, Naruto)..." 
-            autocomplete="off" 
-          />
-          <ul id="autocomplete-list" class="autocomplete-dropdown hidden"></ul>
-        </div>
-      </div>
-
-      <div class="grid-container">
-        <div class="grid-header">
-          <div>Poster</div>
-          <div>Title</div>
-          <div>Year</div>
-          <div>MAL Rank</div>
-          <div>Genres</div>
-        </div>
-        <div id="guesses-container" class="guesses-list"></div>
-      </div>
-
-      <!-- Textual Content for AdSense Indexing -->
-      <section class="editorial-content">
-        <h2>About Anidle</h2>
-        <p>Anidle is a free, daily browser-based deduction game inspired by popular daily word puzzles, custom-built for the anime community. Every midnight, a new mystery anime from an extensive catalog spanning multiple decades and genres is selected as the daily answer. Players have six attempts to discover the target title using comparative cues.</p>
-
-        <h3>How Clues and Feedback Work</h3>
-        <ul>
-          <li><strong>Release Year:</strong> Tells you if the mystery show was released earlier (↓) or later (↑) than your guess.</li>
-          <li><strong>MyAnimeList Rank:</strong> Compares the all-time ranking on MAL. An upward arrow (↑) indicates that the mystery title has a better (lower numerical) position.</li>
-          <li><strong>Genres:</strong> Displays highlighted tags when your guess shares canonical genres with the mystery target.</li>
-        </ul>
-
-        <h3>Frequently Asked Questions</h3>
-        <p><strong>When does the puzzle reset?</strong> The puzzle updates automatically at midnight local time every 24 hours.</p>
-        <p><strong>Where are statistics sourced from?</strong> Show data, popularity ranks, and canonical metadata reflect verified listings from open anime archives.</p>
-      </section>
-
-      <footer class="site-footer">
-        <a href="about.html">About & Contact</a> • 
-        <a href="privacy.html">Privacy Policy</a> • 
-        <a href="terms.html">Terms of Service</a>
-      </footer>
-    </main>
-
-    <!-- Right Ad Banner Slot -->
-    <aside class="ad-sidebar ad-right">
-      <div class="ad-placeholder">
-        <span class="ad-label">Advertisement</span>
-        <!-- AdSense code will go here -->
-      </div>
-    </aside>
-  </div>
-
-  <div id="game-modal" class="modal hidden">
-    <div class="modal-content">
-      <button id="close-modal" class="close-btn">&times;</button>
-      <h2 id="modal-title">Victory!</h2>
-      <div id="modal-poster-wrap"></div>
-      <p id="modal-desc"></p>
-      <div class="share-box">
-        <button id="share-btn">Share Result 📋</button>
       </div>
     </div>
   </div>
 
+  <!-- Master catalog loads first -->
   <script src="animeData.js"></script>
   <script src="app.js"></script>
 </body>
