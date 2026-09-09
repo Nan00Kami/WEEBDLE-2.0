@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Match the Anidle dark theme search input */
+    /* Match Anidle dark theme search input */
     #char-input {
       width: 100%;
       padding: 14px 16px;
@@ -46,14 +46,6 @@
       gap: 6px;
       animation: flipIn 0.5s ease;
     }
-    .goku-yes {
-      background-color: var(--correct) !important;
-      color: #fff;
-    }
-    .goku-no {
-      background-color: var(--incorrect) !important;
-      color: #b0b0b2;
-    }
     .nav-links-bar {
       display: flex;
       gap: 12px;
@@ -79,6 +71,7 @@
           <a href="character.html" class="active" style="color: #538d4e;">Characters</a>
           <a href="higher-lower.html">Duel</a>
           <a href="directory.html">Index</a>
+          <a href="archive.html">Archive</a>
         </div>
       </div>
       <h1 class="title">ANIDLE</h1>
@@ -115,20 +108,20 @@
         <div>Beats Goku?</div>
       </div>
       <div id="guesses-container" class="guesses-list">
-        <!-- Injected via script -->
+        <!-- Injected dynamically -->
       </div>
     </div>
 
-    <!-- AdSense Content Guide -->
+    <!-- Editorial & Explanation Section (AdSense Value) -->
     <section class="info-section" style="width: 100%; margin-top: 36px; padding: 24px; background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13.5px; line-height: 1.7; color: #b0b0b2; text-align: left;">
       <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; text-transform: uppercase;">About Character Anidle</h2>
       <p style="margin-bottom: 14px;">
-        Character Anidle tests your character recall across legendary anime series. Each day at 00:00 local time, a mystery character is picked from our roster. Deduce their identity by matching their parent series, canonical genre roots, biological gender, and the ultimate playground debate parameter: <em>Can they beat Son Goku?</em>
+        Character Anidle tests your character recall across legendary anime series. Each day at 00:00 local time, a mystery character is chosen from our roster. Deduce their identity by matching their parent anime series, canonical genre roots, biological gender, and the ultimate playground debate parameter: <em>Can they beat Son Goku?</em>
       </p>
 
       <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 14px 0 6px;">The Goku Metric Explained</h3>
       <p style="margin-bottom: 12px;">
-        The "Beats Goku?" indicator evaluates universal reality warping, conceptual immortality, and dimensional hacks. If a character possesses causality manipulation (like <em>Giorno Giovanna</em> or <em>Haruhi Suzumiya</em>) or infinite erasure hax, the field flags <strong>YES</strong>. Normal human combatants, sports athletes, and standard shonen brawlers flag <strong>NO</strong>.
+        The "Beats Goku?" indicator evaluates universal reality warping, conceptual immortality, and dimensional hacks. If a character possesses reality-bending powers (such as <em>Haruhi Suzumiya</em>) or infinite erasure hax, the field flags <strong>YES</strong>. Standard human combatants, martial artists, and conventional shonen brawlers flag <strong>NO</strong>.
       </p>
     </section>
 
@@ -137,6 +130,7 @@
       <a href="/" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Anime Daily</a>
       <a href="higher-lower.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Rank Duel</a>
       <a href="directory.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Directory</a>
+      <a href="archive.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Archive</a>
       <a href="about.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">About</a>
       <a href="privacy.html" style="color: var(--text-secondary); text-decoration: underline;">Privacy Policy</a>
     </footer>
@@ -164,7 +158,7 @@
 
     function getTodayKey() {
       const d = new Date();
-      return `char_${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
     function getDailyCharacter() {
@@ -180,6 +174,33 @@
     const charInput = document.getElementById("char-input");
     const autocompleteList = document.getElementById("autocomplete-list");
     const guessesContainer = document.getElementById("guesses-container");
+
+    // Local Storage Persistence
+    function restoreDailyState() {
+      const savedState = JSON.parse(localStorage.getItem(`anidle_char_${todayKey}`) || "null");
+      if (!savedState) return;
+
+      savedState.guesses.forEach(id => {
+        const char = charDatabase.find(c => c.id === id);
+        if (char) renderGuessRow(char);
+      });
+
+      if (savedState.isCompleted) {
+        charInput.disabled = true;
+        charInput.placeholder = "Come back tomorrow for a new character!";
+        const won = guesses.some(g => g.id === targetChar.id);
+        endGame(won, false);
+      }
+    }
+
+    function persistCurrentState(isCompleted, won) {
+      const state = {
+        guesses: guesses.map(g => g.id),
+        isCompleted: isCompleted,
+        won: won
+      };
+      localStorage.setItem(`anidle_char_${todayKey}`, JSON.stringify(state));
+    }
 
     // Search Autocomplete
     let debounceTimer;
@@ -211,7 +232,7 @@
         const li = document.createElement("li");
         li.className = "autocomplete-item";
         li.innerHTML = `
-          <img class="autocomplete-thumb" src="${char.image}" alt="${char.name}" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3C%2Fsvg%3E'"/>
+          <img class="autocomplete-thumb" src="${char.image}" alt="${char.name}" onerror="handleImgError(this)"/>
           <div class="autocomplete-details">
             <span class="autocomplete-name">${char.name}</span>
             <span class="autocomplete-meta">${char.anime} • ${char.gender}</span>
@@ -234,8 +255,10 @@
       const isMatch = guessed.id === targetChar.id;
       const isCompleted = isMatch || guesses.length >= MAX_GUESSES;
 
+      persistCurrentState(isCompleted, isMatch);
+
       if (isCompleted) {
-        endGame(isMatch);
+        endGame(isMatch, true);
       }
     }
 
@@ -260,7 +283,7 @@
 
       row.innerHTML = `
         <div class="cell cell-poster">
-          <img src="${guessed.image}" alt="${guessed.name}" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3C%2Fsvg%3E'" />
+          <img src="${guessed.image}" alt="${guessed.name}" onerror="handleImgError(this)" />
         </div>
         <div class="cell ${isNameMatch ? 'correct' : 'incorrect'}">${guessed.name}</div>
         <div class="cell ${isAnimeMatch ? 'correct' : 'incorrect'}">${guessed.anime}</div>
@@ -272,9 +295,11 @@
       guessesContainer.appendChild(row);
     }
 
-    function endGame(won) {
+    function endGame(won, showModal = true) {
       charInput.disabled = true;
       charInput.placeholder = "Come back tomorrow for a new character!";
+      if (!showModal) return;
+
       const modal = document.getElementById("game-modal");
       document.getElementById("modal-title").innerText = won ? "Victory!" : "Game Over";
       document.getElementById("modal-desc").innerText = won 
@@ -282,8 +307,13 @@
         : `The secret character was: ${targetChar.name} (${targetChar.anime})`;
 
       document.getElementById("modal-poster-wrap").innerHTML = 
-        `<img src="${targetChar.image}" style="width:130px; border-radius:6px; margin: 12px 0;" />`;
+        `<img src="${targetChar.image}" onerror="handleImgError(this)" style="width:130px; border-radius:6px; margin: 12px 0;" />`;
       modal.classList.remove("hidden");
+    }
+
+    function handleImgError(el) {
+      el.onerror = null;
+      el.src = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3Ctext%20fill%3D%22%23818384%22%20font-family%3D%22sans-serif%22%20font-size%3D%229%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENO%20IMG%3C%2Ftext%3E%3C%2Fsvg%3E";
     }
 
     document.getElementById("close-modal").onclick = () => {
@@ -298,6 +328,9 @@
       navigator.clipboard.writeText(shareText);
       alert("Score copied to clipboard!");
     };
+
+    // Initialize state on page load
+    restoreDailyState();
   </script>
 </body>
 </html>
