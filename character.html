@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>ANIDLE — Daily Anime Character Guessing Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Custom 6-column grid for Character Mode */
+    .char-grid-header {
+      display: grid;
+      grid-template-columns: 55px 1.6fr 1.6fr 1.6fr 0.9fr 1fr;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      text-align: center;
+    }
+    .char-guess-row {
+      display: grid;
+      grid-template-columns: 55px 1.6fr 1.6fr 1.6fr 0.9fr 1fr;
+      gap: 6px;
+      animation: flipIn 0.5s ease;
+    }
+    .goku-yes {
+      background-color: var(--correct) !important;
+      color: #fff;
+    }
+    .goku-no {
+      background-color: var(--incorrect) !important;
+      color: #b0b0b2;
+    }
+    .nav-links-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav-links-bar a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .nav-links-bar a.active, .nav-links-bar a:hover {
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="header-left">
+        <div class="nav-links-bar">
+          <a href="/">Anime</a>
+          <a href="character.html" class="active" style="color: #538d4e;">Characters</a>
+          <a href="higher-lower.html">Duel</a>
+          <a href="directory.html">Index</a>
+        </div>
+      </div>
+      <h1 class="title">ANIDLE</h1>
+      <div class="header-right">
+        <button id="stats-btn" class="icon-btn" aria-label="Stats">📊</button>
+      </div>
+    </header>
+
+    <div class="instruction-banner">
+      Guess today's mystery anime character. Green means exact match; yellow indicates partial genre match.
+    </div>
+
+    <!-- Input Section -->
+    <div class="search-section">
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          id="char-input" 
+          placeholder="Type a character name (e.g. Spike Spiegel, Gojo, Anya)..." 
+          autocomplete="off" 
+        />
+        <ul id="autocomplete-list" class="autocomplete-dropdown hidden"></ul>
+      </div>
+    </div>
+
+    <!-- Guess Table / Grid -->
+    <div class="grid-container">
+      <div class="char-grid-header">
+        <div>Photo</div>
+        <div>Character</div>
+        <div>Anime</div>
+        <div>Genres</div>
+        <div>Gender</div>
+        <div>Beats Goku?</div>
+      </div>
+      <div id="guesses-container" class="guesses-list">
+        <!-- Injected via script -->
+      </div>
+    </div>
+
+    <!-- AdSense Content Guide -->
+    <section class="info-section" style="width: 100%; margin-top: 36px; padding: 24px; background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13.5px; line-height: 1.7; color: #b0b0b2; text-align: left;">
+      <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; text-transform: uppercase;">About Character Anidle</h2>
+      <p style="margin-bottom: 14px;">
+        Character Anidle tests your character recall across legendary anime series. Each day at 00:00 local time, a mystery character is picked from our roster. Deduce their identity by matching their parent series, canonical genre roots, biological gender, and the ultimate playground debate parameter: <em>Can they beat Son Goku?</em>
+      </p>
+
+      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 14px 0 6px;">The Goku Metric Explained</h3>
+      <p style="margin-bottom: 12px;">
+        The "Beats Goku?" indicator evaluates universal reality warping, conceptual immortality, and dimensional hacks. If a character possesses causality manipulation (like <em>Giorno Giovanna</em> or <em>Haruhi Suzumiya</em>) or infinite erasure hax, the field flags <strong>YES</strong>. Normal human combatants, sports athletes, and standard shonen brawlers flag <strong>NO</strong>.
+      </p>
+    </section>
+
+    <!-- Footer -->
+    <footer style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); text-align: center; width: 100%;">
+      <a href="/" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Anime Daily</a>
+      <a href="higher-lower.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Rank Duel</a>
+      <a href="directory.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Directory</a>
+      <a href="about.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">About</a>
+      <a href="privacy.html" style="color: var(--text-secondary); text-decoration: underline;">Privacy Policy</a>
+    </footer>
+
+    <!-- Result Modal -->
+    <div id="game-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-modal" class="close-btn">&times;</button>
+        <h2 id="modal-title">Victory!</h2>
+        <div id="modal-poster-wrap"></div>
+        <p id="modal-desc"></p>
+        <div class="share-box">
+          <button id="share-btn">Share Result 📋</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="animeData2.js"></script>
+  <script>
+    let charDatabase = (typeof MASTER_CHARACTER_DATA !== "undefined") ? MASTER_CHARACTER_DATA : [];
+    let targetChar = null;
+    let guesses = [];
+    const MAX_GUESSES = 6;
+
+    function getTodayKey() {
+      const d = new Date();
+      return `char_${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getDailyCharacter() {
+      const epoch = new Date(2024, 0, 1).getTime();
+      const today = new Date().setHours(0, 0, 0, 0);
+      const dayIndex = Math.floor((today - epoch) / (1000 * 60 * 60 * 24));
+      return charDatabase[dayIndex % charDatabase.length];
+    }
+
+    targetChar = getDailyCharacter();
+    const todayKey = getTodayKey();
+
+    const charInput = document.getElementById("char-input");
+    const autocompleteList = document.getElementById("autocomplete-list");
+    const guessesContainer = document.getElementById("guesses-container");
+
+    // Search Autocomplete
+    let debounceTimer;
+    charInput.addEventListener("input", (e) => {
+      clearTimeout(debounceTimer);
+      const query = e.target.value.trim().toLowerCase();
+
+      if (query.length < 2) {
+        autocompleteList.classList.add("hidden");
+        return;
+      }
+
+      debounceTimer = setTimeout(() => {
+        const matches = charDatabase
+          .filter(c => c.name.toLowerCase().includes(query) || c.anime.toLowerCase().includes(query))
+          .slice(0, 7);
+        renderAutocomplete(matches);
+      }, 100);
+    });
+
+    function renderAutocomplete(list) {
+      autocompleteList.innerHTML = "";
+      if (list.length === 0) {
+        autocompleteList.classList.add("hidden");
+        return;
+      }
+
+      list.forEach(char => {
+        const li = document.createElement("li");
+        li.className = "autocomplete-item";
+        li.innerHTML = `
+          <img class="autocomplete-thumb" src="${char.image}" alt="${char.name}" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3C%2Fsvg%3E'"/>
+          <div class="autocomplete-details">
+            <span class="autocomplete-name">${char.name}</span>
+            <span class="autocomplete-meta">${char.anime} • ${char.gender}</span>
+          </div>
+        `;
+        li.addEventListener("click", () => {
+          submitGuess(char);
+          charInput.value = "";
+          autocompleteList.classList.add("hidden");
+        });
+        autocompleteList.appendChild(li);
+      });
+      autocompleteList.classList.remove("hidden");
+    }
+
+    function submitGuess(guessed) {
+      if (guesses.some(g => g.id === guessed.id)) return;
+      renderGuessRow(guessed);
+
+      const isMatch = guessed.id === targetChar.id;
+      const isCompleted = isMatch || guesses.length >= MAX_GUESSES;
+
+      if (isCompleted) {
+        endGame(isMatch);
+      }
+    }
+
+    function renderGuessRow(guessed) {
+      guesses.push(guessed);
+      const row = document.createElement("div");
+      row.className = "char-guess-row";
+
+      const isNameMatch = guessed.id === targetChar.id;
+      const isAnimeMatch = guessed.anime === targetChar.anime;
+      const isGenderMatch = guessed.gender === targetChar.gender;
+      const isGokuMatch = guessed.beatsGoku === targetChar.beatsGoku;
+
+      // Genre match calculation
+      const sharedGenres = guessed.genres.filter(g => targetChar.genres.includes(g));
+      let genreClass = "incorrect";
+      if (sharedGenres.length === targetChar.genres.length && guessed.genres.length === targetChar.genres.length) {
+        genreClass = "correct";
+      } else if (sharedGenres.length > 0) {
+        genreClass = "partial";
+      }
+
+      row.innerHTML = `
+        <div class="cell cell-poster">
+          <img src="${guessed.image}" alt="${guessed.name}" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3C%2Fsvg%3E'" />
+        </div>
+        <div class="cell ${isNameMatch ? 'correct' : 'incorrect'}">${guessed.name}</div>
+        <div class="cell ${isAnimeMatch ? 'correct' : 'incorrect'}">${guessed.anime}</div>
+        <div class="cell ${genreClass}">${guessed.genres.slice(0, 2).join(", ")}</div>
+        <div class="cell ${isGenderMatch ? 'correct' : 'incorrect'}">${guessed.gender}</div>
+        <div class="cell ${isGokuMatch ? 'correct' : 'incorrect'}">${guessed.beatsGoku ? 'YES' : 'NO'}</div>
+      `;
+
+      guessesContainer.appendChild(row);
+    }
+
+    function endGame(won) {
+      charInput.disabled = true;
+      charInput.placeholder = "Come back tomorrow for a new character!";
+      const modal = document.getElementById("game-modal");
+      document.getElementById("modal-title").innerText = won ? "Victory!" : "Game Over";
+      document.getElementById("modal-desc").innerText = won 
+        ? `You deduced ${targetChar.name} from ${targetChar.anime}!`
+        : `The secret character was: ${targetChar.name} (${targetChar.anime})`;
+
+      document.getElementById("modal-poster-wrap").innerHTML = 
+        `<img src="${targetChar.image}" style="width:130px; border-radius:6px; margin: 12px 0;" />`;
+      modal.classList.remove("hidden");
+    }
+
+    document.getElementById("close-modal").onclick = () => {
+      document.getElementById("game-modal").classList.add("hidden");
+    };
+
+    document.getElementById("share-btn").onclick = () => {
+      let shareText = `ANIDLE (Characters) - ${guesses.length}/${MAX_GUESSES}\n`;
+      guesses.forEach(g => {
+        shareText += (g.id === targetChar.id) ? "🟩🟩🟩🟩🟩\n" : "⬛🟨⬛⬛⬛\n";
+      });
+      navigator.clipboard.writeText(shareText);
+      alert("Score copied to clipboard!");
+    };
+  </script>
+</body>
+</html>
