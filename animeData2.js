@@ -409,7 +409,7 @@ const MASTER_CHARACTER_DATA = [
     ],
     "gender": "Male",
     "beatsGoku": false,
-    "image": "https://img.anili.st/character/127993"
+    "image": "https://static.wikitide.net/deathbattlewiki/1/10/Portrait.satorugojo.png"
   },
   {
     "id": 32,
