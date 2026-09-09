@@ -10,21 +10,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- ======================================================= -->
-  <!-- PASTE YOUR GOOGLE ADSENSE VERIFICATION SCRIPT BELOW HERE -->
-  <!-- Example: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-..." crossorigin="anonymous"></script> -->
-  <!-- ======================================================= -->
-
+  <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4741478816489817"
      crossorigin="anonymous"></script>
-
-  
 </head>
 <body>
   <div class="app-container">
     <header class="header">
-      <div class="header-left">
+      <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
         <button id="help-btn" class="icon-btn" aria-label="Help">?</button>
+        <a href="directory.html" style="color: var(--text-secondary); font-size: 13px; text-decoration: none; font-weight: 600;">Directory</a>
+        <a href="archive.html" style="color: var(--text-secondary); font-size: 13px; text-decoration: none; font-weight: 600;">Archive</a>
       </div>
       <h1 class="title">ANIDLE</h1>
       <div class="header-right">
@@ -74,18 +70,33 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- PASTE AN IN-PAGE DISPLAY AD CODE SNIPPET HERE IF NEEDED -->
-    <!-- Keeps safe separation from active game interactions     -->
-    <!-- ======================================================= -->
+    <!-- Comprehensive Editorial & Game Strategy Guide (Publisher Content for Google) -->
+    <section class="info-section" style="width: 100%; margin-top: 36px; padding: 24px; background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13.5px; line-height: 1.7; color: #b0b0b2; text-align: left;">
+      <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">How to Play Anidle</h2>
+      <p style="margin-bottom: 14px;">
+        Anidle is an interactive daily trivia game designed to test your knowledge of Japanese animation history. Each day at midnight local time, our engine selects a single secret anime from a curated master catalog spanning the 1980s through modern releases. You have six attempts to guess the mystery title using comparative deduction across three key attributes: release year, MyAnimeList (MAL) popularity rank, and genre classifications.
+      </p>
 
-    <!-- Static Info Section (FAQ, Copyright, Contact) -->
-    <section class="info-section" style="width: 100%; margin-top: 36px; padding: 24px; background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; line-height: 1.6; color: var(--text-secondary); text-align: left;">
-      <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Frequently Asked Questions</h2>
+      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 6px;">Understanding the Clues</h3>
+      <ul style="padding-left: 20px; margin-bottom: 16px;">
+        <li style="margin-bottom: 6px;"><strong>Release Year:</strong> An upward arrow (↑) indicates the target anime aired <em>later</em> than your guess. A downward arrow (↓) indicates the target anime aired <em>earlier</em>.</li>
+        <li style="margin-bottom: 6px;"><strong>MyAnimeList Rank:</strong> Rankings reflect global score standing. An upward arrow (↑) means the target title has a numerically higher rating/rank (e.g., #2 <em>Fullmetal Alchemist: Brotherhood</em> is ranked higher than #50 <em>GTO</em>). A downward arrow (↓) means the target title has a lower rank.</li>
+        <li style="margin-bottom: 6px;"><strong>Genres:</strong> Yellow indicates that your guess shares at least one canonical genre with the mystery anime. Green indicates a full genre intersection.</li>
+      </ul>
+
+      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 6px;">Strategic Deductive Tips</h3>
+      <p style="margin-bottom: 12px;">
+        To consistently solve the daily puzzle within six tries, consider starting with a "mid-distribution" title released between 2010 and 2015 with a rank around #200–#400. Shows like <em>Psycho-Pass</em>, <em>Magi</em>, or <em>Noragami</em> span diverse genres and immediately halve both the chronological and ranking search space.
+      </p>
+      <p style="margin-bottom: 16px;">
+        Pay close attention to genre mismatches. If your first guess turns up grey on action or comedy, shift your second guess toward slice-of-life, romance, psychological, or sports titles to quickly isolate the target demographic. You can browse our complete dataset anytime in the <a href="directory.html" style="color: var(--correct); text-decoration: underline;">Anime Directory</a> or review past daily answers in our <a href="archive.html" style="color: var(--correct); text-decoration: underline;">Puzzle Archive</a>.
+      </p>
+
+      <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 24px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Frequently Asked Questions</h2>
       
       <div style="margin-bottom: 14px;">
         <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">When does the puzzle refresh?</p>
-        <p>A new mystery anime is selected automatically each day at 00:00 local time.</p>
+        <p>A new mystery anime is selected automatically each day at 00:00 local time based on an anchored calendar cycle.</p>
       </div>
 
       <div style="margin-bottom: 14px;">
@@ -95,24 +106,25 @@
 
       <div style="margin-bottom: 20px;">
         <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">Can I play previous days?</p>
-        <p>Currently, Anidle features one shared daily puzzle per cycle. Your streaks and game history are saved to your local browser storage.</p>
+        <p>You can review all previous puzzle answers and metadata in the <a href="archive.html" style="color: var(--correct); text-decoration: underline;">Daily Puzzle Archive</a>. Your personal streaks and career statistics remain saved to your browser's local storage.</p>
       </div>
 
       <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Copyright &amp; Fair Use Notice</h2>
-<p style="margin-bottom: 16px;">
-  Anidle is an independent fan-made trivia and deduction game. All anime titles, characters, and related promotional artwork are the intellectual property and copyright of their respective animation studios, authors, and publishers. 
-  <br><br>
-  Titles and metadata are referenced under nominative fair use for factual identification, commentary, and transformative gaming purposes. Display advertisements, if present, serve to offset domain and hosting infrastructure expenses. If you are a copyright owner and believe your material has been referenced in a manner that infringes your rights, please contact us for prompt removal.
-</p>
-      
-      
+      <p style="margin-bottom: 16px;">
+        Anidle is an independent fan-made trivia and deduction game. All anime titles, characters, and related promotional artwork are the intellectual property and copyright of their respective animation studios, authors, and publishers.
+        <br><br>
+        Titles and metadata are referenced under nominative fair use for factual identification, commentary, and transformative gaming purposes. Display advertisements, if present, serve to offset domain and hosting infrastructure expenses. If you are a copyright owner and believe your material has been referenced in a manner that infringes your rights, please contact us for prompt removal.
+      </p>
+      <p>
         For catalog suggestions, rights clearance inquiries, technical feedback, or bug reports, please contact us directly at 
         <a href="mailto:anidlegame@gmail.com" style="color: var(--correct); text-decoration: underline;">anidlegame@gmail.com</a>.
       </p>
     </section>
 
-    <!-- Footer links to compliance pages -->
+    <!-- Footer links to compliance and internal index pages -->
     <footer style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); text-align: center; width: 100%;">
+      <a href="directory.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Anime Directory</a>
+      <a href="archive.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Puzzle Archive</a>
       <a href="about.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">About &amp; Attribution</a>
       <a href="privacy.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Privacy Policy</a>
       <a href="mailto:anidlegame@gmail.com" style="color: var(--text-secondary); text-decoration: underline;">Contact</a>
