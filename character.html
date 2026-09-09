@@ -10,6 +10,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* Match the Anidle dark theme search input */
+    #char-input {
+      width: 100%;
+      padding: 14px 16px;
+      background-color: var(--panel-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #char-input:focus {
+      border-color: #565758;
+    }
+
     /* Custom 6-column grid for Character Mode */
     .char-grid-header {
       display: grid;
