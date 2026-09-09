@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Anime Index & Catalog — Anidle</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .page-wrapper {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+    .nav-bar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .nav-bar a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .nav-bar a.active, .nav-bar a:hover {
+      color: var(--text-primary);
+    }
+    .editorial-block {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 24px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+      color: #b0b0b2;
+      font-size: 14px;
+    }
+    .editorial-block h1 {
+      color: var(--text-primary);
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .editorial-block h2 {
+      color: var(--text-primary);
+      font-size: 17px;
+      font-weight: 700;
+      margin: 18px 0 8px;
+    }
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-input {
+      flex: 1;
+      min-width: 220px;
+      padding: 10px 14px;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-primary);
+      outline: none;
+      font-family: inherit;
+    }
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .anime-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      align-items: center;
+    }
+    .anime-card img {
+      width: 55px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .anime-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow: hidden;
+    }
+    .anime-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .anime-card-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .genre-tag-list {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .genre-tag {
+      font-size: 10px;
+      background: var(--incorrect);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <nav class="nav-bar">
+      <a href="/">← Back to Game</a>
+      <a href="directory.html" class="active">Anime Directory</a>
+      <a href="archive.html">Puzzle Archive</a>
+      <a href="about.html">About & Attribution</a>
+    </nav>
+
+    <!-- Static Crawler-Friendly Content Block -->
+    <section class="editorial-block">
+      <h1>Anidle Master Anime Index &amp; Database</h1>
+      <p>
+        The Anidle Catalog serves as the official reference database for our daily comparative guessing puzzles. 
+        Spanning over three decades of animation history—from foundational 1980s and 1990s masterpieces to modern seasonal hits—our 
+        index cross-references release years, canonical genre classifications, and historical MyAnimeList (MAL) popularity rankings.
+      </p>
+
+      <h2>How Titles Are Ranked & Evaluated</h2>
+      <p>
+        Every entry in the catalog is indexed with three primary comparative markers:
+      </p>
+      <ul style="padding-left: 20px; margin-bottom: 12px;">
+        <li><strong>Release Period:</strong> Represents the calendar year in which the television series or feature film premiered.</li>
+        <li><strong>Global Popularity & Score Rank:</strong> Reflects the title's standing relative to global community score aggregations. In the game, a lower rank number (e.g. #1) denotes a higher overall standing than a larger number (e.g. #300).</li>
+        <li><strong>Genre Taxonomy:</strong> Titles are tagged with official genres (such as Sci-Fi, Psychological, Shonen, Romance, or Action) to enable inductive player deduction.</li>
+      </ul>
+
+      <h2>Historical Eras Represented</h2>
+      <p>
+        Our catalog includes milestone works across multiple production eras: the cell-animated golden age (such as <em>Neon Genesis Evangelion</em> and <em>Cowboy Bebop</em>), the digital transition era of the mid-2000s (such as <em>Death Note</em> and <em>Monster</em>), and the modern studio era (such as <em>Frieren: Beyond Journey's End</em> and <em>Jujutsu Kaisen</em>).
+      </p>
+    </section>
+
+    <!-- Interactive Directory Search -->
+    <div class="filter-bar">
+      <input type="text" id="dir-search" class="filter-input" placeholder="Search catalog by title or genre..." />
+    </div>
+
+    <div id="catalog-container" class="catalog-grid">
+      <!-- Injected via animeData.js -->
+    </div>
+  </div>
+
+  <script src="animeData.js"></script>
+  <script>
+    const container = document.getElementById("catalog-container");
+    const search = document.getElementById("dir-search");
+
+    function renderCatalog(list) {
+      container.innerHTML = "";
+      list.forEach(anime => {
+        const card = document.createElement("div");
+        card.className = "anime-card";
+        card.innerHTML = `
+          <img src="${anime.image}" alt="${anime.title}" loading="lazy" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3C%2Fsvg%3E'" />
+          <div class="anime-card-info">
+            <span class="anime-card-title">${anime.title}</span>
+            <span class="anime-card-meta">${anime.year} • MAL Rank #${anime.rank}</span>
+            <div class="genre-tag-list">
+              ${anime.genres.map(g => `<span class="genre-tag">${g}</span>`).join("")}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    renderCatalog(MASTER_ANIME_DATA);
+
+    search.addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      const filtered = MASTER_ANIME_DATA.filter(a => 
+        a.title.toLowerCase().includes(q) || 
+        a.genres.some(g => g.toLowerCase().includes(q))
+      );
+      renderCatalog(filtered);
+    });
+  </script>
+</body>
+</html>
