@@ -10,7 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Match Anidle dark theme search input */
     #char-input {
       width: 100%;
       padding: 14px 16px;
@@ -28,12 +27,12 @@
       border-color: #565758;
     }
 
-    /* Custom 6-column grid for Character Mode */
+    /* 7-column layout: Photo, Character, Anime, Year, Genres, Gender, Beats Goku */
     .char-grid-header {
       display: grid;
-      grid-template-columns: 55px 1.6fr 1.6fr 1.6fr 0.9fr 1fr;
-      gap: 6px;
-      font-size: 11px;
+      grid-template-columns: 55px 1.4fr 1.4fr 0.8fr 1.3fr 0.8fr 0.9fr;
+      gap: 5px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       color: var(--text-secondary);
@@ -42,8 +41,8 @@
     }
     .char-guess-row {
       display: grid;
-      grid-template-columns: 55px 1.6fr 1.6fr 1.6fr 0.9fr 1fr;
-      gap: 6px;
+      grid-template-columns: 55px 1.4fr 1.4fr 0.8fr 1.3fr 0.8fr 0.9fr;
+      gap: 5px;
       animation: flipIn 0.5s ease;
     }
     .nav-links-bar {
@@ -81,7 +80,7 @@
     </header>
 
     <div class="instruction-banner">
-      Guess today's mystery anime character. Green means exact match; yellow indicates partial genre match.
+      Guess today's mystery anime character. Green means exact match; yellow indicates partial match.
     </div>
 
     <!-- Input Section -->
@@ -103,26 +102,26 @@
         <div>Photo</div>
         <div>Character</div>
         <div>Anime</div>
+        <div>Year</div>
         <div>Genres</div>
         <div>Gender</div>
         <div>Beats Goku?</div>
       </div>
-      <div id="guesses-container" class="guesses-list">
-        <!-- Injected dynamically -->
-      </div>
+      <div id="guesses-container" class="guesses-list"></div>
     </div>
 
-    <!-- Editorial & Explanation Section (AdSense Value) -->
+    <!-- Editorial Rules & Guide (AdSense Compliance) -->
     <section class="info-section" style="width: 100%; margin-top: 36px; padding: 24px; background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13.5px; line-height: 1.7; color: #b0b0b2; text-align: left;">
       <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; text-transform: uppercase;">About Character Anidle</h2>
       <p style="margin-bottom: 14px;">
-        Character Anidle tests your character recall across legendary anime series. Each day at 00:00 local time, a mystery character is chosen from our roster. Deduce their identity by matching their parent anime series, canonical genre roots, biological gender, and the ultimate playground debate parameter: <em>Can they beat Son Goku?</em>
+        Character Anidle tests your anime memory across iconic series. Each day at 00:00 local time, a mystery character is chosen from our catalog. Deduce their identity using clues based on their parent anime, air year, canonical genres, biological gender, and whether they can defeat Son Goku.
       </p>
 
-      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 14px 0 6px;">The Goku Metric Explained</h3>
-      <p style="margin-bottom: 12px;">
-        The "Beats Goku?" indicator evaluates universal reality warping, conceptual immortality, and dimensional hacks. If a character possesses reality-bending powers (such as <em>Haruhi Suzumiya</em>) or infinite erasure hax, the field flags <strong>YES</strong>. Standard human combatants, martial artists, and conventional shonen brawlers flag <strong>NO</strong>.
-      </p>
+      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 14px 0 6px;">Understanding the Clues</h3>
+      <ul style="padding-left: 20px; margin-bottom: 12px;">
+        <li><strong>Air Year:</strong> Shows whether the character's parent series aired earlier (↓) or later (↑) than your guess.</li>
+        <li><strong>Beats Goku?:</strong> Flags YES for conceptual reality-warping entities, multiversal deities, and reality-erasers; NO for normal human fighters, martial artists, and standard brawlers.</li>
+      </ul>
     </section>
 
     <!-- Footer -->
@@ -149,16 +148,24 @@
     </div>
   </div>
 
+  <script src="animeData.js"></script>
   <script src="animeData2.js"></script>
   <script>
     let charDatabase = (typeof MASTER_CHARACTER_DATA !== "undefined") ? MASTER_CHARACTER_DATA : [];
+    let masterAnime = (typeof MASTER_ANIME_DATA !== "undefined") ? MASTER_ANIME_DATA : [];
+
+    function getAnimeYear(animeTitle) {
+      const match = masterAnime.find(a => a.title.toLowerCase() === animeTitle.toLowerCase());
+      return match ? match.year : null;
+    }
+
     let targetChar = null;
     let guesses = [];
     const MAX_GUESSES = 6;
 
     function getTodayKey() {
       const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      return `char_${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
     function getDailyCharacter() {
@@ -170,12 +177,12 @@
 
     targetChar = getDailyCharacter();
     const todayKey = getTodayKey();
+    const targetYear = getAnimeYear(targetChar.anime);
 
     const charInput = document.getElementById("char-input");
     const autocompleteList = document.getElementById("autocomplete-list");
     const guessesContainer = document.getElementById("guesses-container");
 
-    // Local Storage Persistence
     function restoreDailyState() {
       const savedState = JSON.parse(localStorage.getItem(`anidle_char_${todayKey}`) || "null");
       if (!savedState) return;
@@ -202,7 +209,6 @@
       localStorage.setItem(`anidle_char_${todayKey}`, JSON.stringify(state));
     }
 
-    // Search Autocomplete
     let debounceTimer;
     charInput.addEventListener("input", (e) => {
       clearTimeout(debounceTimer);
@@ -229,13 +235,14 @@
       }
 
       list.forEach(char => {
+        const charYear = getAnimeYear(char.anime) || "—";
         const li = document.createElement("li");
         li.className = "autocomplete-item";
         li.innerHTML = `
           <img class="autocomplete-thumb" src="${char.image}" alt="${char.name}" onerror="handleImgError(this)"/>
           <div class="autocomplete-details">
             <span class="autocomplete-name">${char.name}</span>
-            <span class="autocomplete-meta">${char.anime} • ${char.gender}</span>
+            <span class="autocomplete-meta">${char.anime} (${charYear}) • ${char.gender}</span>
           </div>
         `;
         li.addEventListener("click", () => {
@@ -267,12 +274,15 @@
       const row = document.createElement("div");
       row.className = "char-guess-row";
 
+      const guessedYear = getAnimeYear(guessed.anime);
+      const isYearMatch = guessedYear && targetYear && guessedYear === targetYear;
+      const yearArrow = (guessedYear && targetYear && guessedYear < targetYear) ? "↑" : ((guessedYear && targetYear && guessedYear > targetYear) ? "↓" : "");
+
       const isNameMatch = guessed.id === targetChar.id;
       const isAnimeMatch = guessed.anime === targetChar.anime;
       const isGenderMatch = guessed.gender === targetChar.gender;
       const isGokuMatch = guessed.beatsGoku === targetChar.beatsGoku;
 
-      // Genre match calculation
       const sharedGenres = guessed.genres.filter(g => targetChar.genres.includes(g));
       let genreClass = "incorrect";
       if (sharedGenres.length === targetChar.genres.length && guessed.genres.length === targetChar.genres.length) {
@@ -287,6 +297,9 @@
         </div>
         <div class="cell ${isNameMatch ? 'correct' : 'incorrect'}">${guessed.name}</div>
         <div class="cell ${isAnimeMatch ? 'correct' : 'incorrect'}">${guessed.anime}</div>
+        <div class="cell ${isYearMatch ? 'correct' : 'incorrect'}">
+          ${guessedYear || '—'} ${!isYearMatch && yearArrow ? `<span class="arrow">${yearArrow}</span>` : ''}
+        </div>
         <div class="cell ${genreClass}">${guessed.genres.slice(0, 2).join(", ")}</div>
         <div class="cell ${isGenderMatch ? 'correct' : 'incorrect'}">${guessed.gender}</div>
         <div class="cell ${isGokuMatch ? 'correct' : 'incorrect'}">${guessed.beatsGoku ? 'YES' : 'NO'}</div>
@@ -323,13 +336,12 @@
     document.getElementById("share-btn").onclick = () => {
       let shareText = `ANIDLE (Characters) - ${guesses.length}/${MAX_GUESSES}\n`;
       guesses.forEach(g => {
-        shareText += (g.id === targetChar.id) ? "🟩🟩🟩🟩🟩\n" : "⬛🟨⬛⬛⬛\n";
+        shareText += (g.id === targetChar.id) ? "🟩🟩🟩🟩🟩🟩\n" : "⬛🟨⬛⬛⬛⬛\n";
       });
       navigator.clipboard.writeText(shareText);
       alert("Score copied to clipboard!");
     };
 
-    // Initialize state on page load
     restoreDailyState();
   </script>
 </body>
