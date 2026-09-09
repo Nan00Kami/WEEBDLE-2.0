@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Anidle: Higher or Lower — Anime Rank Duel</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      overflow-x: hidden;
+    }
+    .duel-page-container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 16px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .top-nav {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .top-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .top-nav a:hover, .top-nav a.active {
+      color: var(--text-primary);
+    }
+    .scoreboard {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .score-chip {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+    .score-chip span {
+      color: var(--correct);
+    }
+
+    /* Game Arena */
+    .arena-container {
+      width: 100%;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      background: #000;
+      min-height: 480px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+
+    @media (max-width: 700px) {
+      .arena-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+        min-height: 700px;
+      }
+    }
+
+    .anime-side {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      text-align: center;
+      overflow: hidden;
+      transition: background-color 0.4s ease;
+    }
+
+    /* Backdrop image with heavy blur to handle low-res posters */
+    .backdrop-blur {
+      position: absolute;
+      inset: -20px;
+      background-size: cover;
+      background-position: center;
+      filter: blur(28px) brightness(0.28);
+      z-index: 1;
+      transform: scale(1.15);
+      transition: background-image 0.5s ease-in-out;
+    }
+
+    .side-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .poster-frame {
+      width: 120px;
+      height: 170px;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+      border: 2px solid rgba(255,255,255,0.15);
+      margin-bottom: 14px;
+      background: #1a1a1b;
+    }
+
+    .poster-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .anime-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .anime-subtitle {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .rank-display {
+      font-size: 38px;
+      font-weight: 900;
+      color: #ffd700;
+      letter-spacing: -0.02em;
+      text-shadow: 0 4px 14px rgba(255,215,0,0.3);
+      margin: 4px 0;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Central VS Badge */
+    .vs-circle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #121213;
+      font-weight: 900;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      border: 3px solid #121213;
+    }
+
+    /* Guess Buttons */
+    .btn-action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn-guess {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 12px 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-guess:hover:not(:disabled) {
+      background: #ffffff;
+      color: #121213;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255,255,255,0.25);
+    }
+
+    .btn-guess:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .btn-guess:disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+
+    /* Slide Transition Animations */
+    .slide-in-right {
+      animation: slideInRight 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .flash-correct {
+      background-color: rgba(83, 141, 78, 0.35) !important;
+    }
+
+    .flash-wrong {
+      background-color: rgba(200, 40, 40, 0.35) !important;
+    }
+
+    /* Game Over Modal / Result Overlay */
+    .result-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 18, 19, 0.95);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .result-title {
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .btn-restart {
+      margin-top: 18px;
+      background: var(--correct);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn-restart:hover {
+      transform: scale(1.04);
+    }
+
+    /* Editorial Documentation Area for Google Review */
+    .editorial-section {
+      width: 100%;
+      margin-top: 36px;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 24px;
+      color: #b0b0b2;
+      font-size: 13.5px;
+      line-height: 1.7;
+      text-align: left;
+    }
+
+    .editorial-section h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .editorial-section h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 14px 0 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="duel-page-container">
+    <nav class="top-nav">
+      <div style="display: flex; gap: 14px; align-items: center;">
+        <a href="/">← Classic Anidle</a>
+        <a href="higher-lower.html" class="active">Rank Duel</a>
+        <a href="directory.html">Directory</a>
+        <a href="archive.html">Archive</a>
+      </div>
+      <div class="scoreboard">
+        <div class="score-chip">Round: <span id="round-num">1</span>/10</div>
+        <div class="score-chip">Streak: <span id="streak-num">0</span></div>
+      </div>
+    </nav>
+
+    <!-- Interactive Game Canvas -->
+    <div class="arena-container" id="arena">
+      <div class="vs-circle">VS</div>
+
+      <!-- Left Side (Established Anime) -->
+      <div class="anime-side" id="left-side">
+        <div class="backdrop-blur" id="left-bg"></div>
+        <div class="side-content">
+          <div class="poster-frame">
+            <img id="left-poster" src="" alt="Poster" />
+          </div>
+          <div class="anime-name" id="left-title">—</div>
+          <div class="anime-subtitle">has a global MAL rank of</div>
+          <div class="rank-display" id="left-rank">#—</div>
+        </div>
+      </div>
+
+      <!-- Right Side (The Challenge) -->
+      <div class="anime-side" id="right-side">
+        <div class="backdrop-blur" id="right-bg"></div>
+        <div class="side-content" id="right-content">
+          <div class="poster-frame">
+            <img id="right-poster" src="" alt="Poster" />
+          </div>
+          <div class="anime-name" id="right-title">—</div>
+          <div class="anime-subtitle">is ranked</div>
+          
+          <div id="right-rank-container" style="display: none;" class="rank-display">
+            <span id="right-rank">#—</span>
+          </div>
+
+          <div class="btn-action-group" id="actions">
+            <button class="btn-guess" id="btn-higher">
+              Higher Rank ▲ <span style="font-size: 11px; opacity: 0.85;">(#1 to #50)</span>
+            </button>
+            <button class="btn-guess" id="btn-lower">
+              Lower Rank ▼ <span style="font-size: 11px; opacity: 0.85;">(#100+)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Victory / Game Over Overlay -->
+      <div id="result-screen" class="result-screen" style="display: none;">
+        <h2 id="result-title" class="result-title">Game Over</h2>
+        <p id="result-desc" style="color: #b0b0b2; max-width: 360px; font-size: 15px; margin-bottom: 12px;">You reached a streak of 4.</p>
+        <button id="btn-restart" class="btn-restart">Play Again ↻</button>
+      </div>
+    </div>
+
+    <!-- Editorial Rules & Mechanics (AdSense Compliance) -->
+    <section class="editorial-section">
+      <h2>About Anime Rank Duel (Higher or Lower)</h2>
+      <p>
+        Anidle Rank Duel tests your global anime popularity perception. Players are presented with pairs of notable anime from our master index. Your objective is to deduce whether the contender on the right holds a higher standing (closer to rank #1) or a lower standing on global MyAnimeList leaderboards than the benchmark anime on the left.
+      </p>
+
+      <h3>Rules &amp; 10-Streak Victory Condition</h3>
+      <ul style="padding-left: 20px; margin-bottom: 12px;">
+        <li><strong>Ranking Polarity:</strong> Remember that MyAnimeList rank #1 (such as <em>Frieren</em>) represents the highest possible score, while rank #500 represents a comparatively lower standing.</li>
+        <li><strong>Winning the Gauntlet:</strong> Guess correctly across 10 successive rounds to beat the duel. An incorrect answer immediately halts the run and logs your final score.</li>
+        <li><strong>Data Synchronization:</strong> Metadata and rankings are sourced from our verified <a href="directory.html" style="color: var(--correct); text-decoration: underline;">Anime Directory</a>.</li>
+      </ul>
+    </section>
+
+    <!-- Standard Footer -->
+    <footer style="margin-top: 28px; font-size: 12px; color: var(--text-secondary); text-align: center; width: 100%;">
+      <a href="/" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Play Classic</a>
+      <a href="directory.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Anime Directory</a>
+      <a href="archive.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Puzzle Archive</a>
+      <a href="about.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">About &amp; Attribution</a>
+      <a href="privacy.html" style="color: var(--text-secondary); text-decoration: underline;">Privacy Policy</a>
+    </footer>
+  </div>
+
+  <script src="animeData.js"></script>
+  <script>
+    let animePool = [];
+    let currentLeft = null;
+    let currentRight = null;
+    let streak = 0;
+    const MAX_ROUNDS = 10;
+
+    // Elements
+    const leftTitle = document.getElementById("left-title");
+    const leftRank = document.getElementById("left-rank");
+    const leftPoster = document.getElementById("left-poster");
+    const leftBg = document.getElementById("left-bg");
+
+    const rightSide = document.getElementById("right-side");
+    const rightContent = document.getElementById("right-content");
+    const rightTitle = document.getElementById("right-title");
+    const rightRank = document.getElementById("right-rank");
+    const rightRankContainer = document.getElementById("right-rank-container");
+    const rightPoster = document.getElementById("right-poster");
+    const rightBg = document.getElementById("right-bg");
+
+    const actions = document.getElementById("actions");
+    const btnHigher = document.getElementById("btn-higher");
+    const btnLower = document.getElementById("btn-lower");
+
+    const roundNumEl = document.getElementById("round-num");
+    const streakNumEl = document.getElementById("streak-num");
+
+    const resultScreen = document.getElementById("result-screen");
+    const resultTitle = document.getElementById("result-title");
+    const resultDesc = document.getElementById("result-desc");
+    const btnRestart = document.getElementById("btn-restart");
+
+    function initGame() {
+      // Clone and shuffle pool
+      animePool = [...MASTER_ANIME_DATA].sort(() => 0.5 - Math.random());
+      streak = 0;
+      updateScoreUI();
+      resultScreen.style.display = "none";
+
+      currentLeft = animePool.pop();
+      currentRight = getNextUniqueContender(currentLeft);
+      
+      renderLeft(currentLeft);
+      renderRight(currentRight);
+    }
+
+    function getNextUniqueContender(exclude) {
+      if (animePool.length === 0) {
+        animePool = [...MASTER_ANIME_DATA].sort(() => 0.5 - Math.random());
+      }
+      let contender = animePool.pop();
+      while (contender.id === exclude.id || contender.rank === exclude.rank) {
+        contender = animePool.pop();
+      }
+      return contender;
+    }
+
+    function renderLeft(anime) {
+      leftTitle.textContent = anime.title;
+      leftRank.textContent = `#${anime.rank}`;
+      leftPoster.src = anime.image;
+      leftBg.style.backgroundImage = `url('${anime.image}')`;
+    }
+
+    function renderRight(anime) {
+      rightTitle.textContent = anime.title;
+      rightPoster.src = anime.image;
+      rightBg.style.backgroundImage = `url('${anime.image}')`;
+      rightRankContainer.style.display = "none";
+      actions.style.display = "flex";
+      btnHigher.disabled = false;
+      btnLower.disabled = false;
+      rightSide.className = "anime-side";
+      
+      // Trigger animation
+      rightContent.classList.remove("slide-in-right");
+      void rightContent.offsetWidth; // force reflow
+      rightContent.classList.add("slide-in-right");
+    }
+
+    function updateScoreUI() {
+      roundNumEl.textContent = Math.min(streak + 1, MAX_ROUNDS);
+      streakNumEl.textContent = streak;
+    }
+
+    // Number ticker effect for dramatic reveal
+    function animateValue(obj, start, end, duration, callback) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const current = Math.floor(progress * (end - start) + start);
+        obj.textContent = `#${current}`;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          obj.textContent = `#${end}`;
+          if (callback) callback();
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function handleGuess(guessIsHigher) {
+      btnHigher.disabled = true;
+      btnLower.disabled = true;
+
+      // In MAL rank: smaller number = HIGHER rank
+      const isActuallyHigher = currentRight.rank < currentLeft.rank;
+      const isCorrect = (guessIsHigher && isActuallyHigher) || (!guessIsHigher && !isActuallyHigher);
+
+      // Reveal Right Rank with counter animation
+      actions.style.display = "none";
+      rightRankContainer.style.display = "flex";
+      
+      animateValue(rightRank, 0, currentRight.rank, 700, () => {
+        if (isCorrect) {
+          streak++;
+          rightSide.classList.add("flash-correct");
+          updateScoreUI();
+
+          setTimeout(() => {
+            if (streak >= MAX_ROUNDS) {
+              finishGame(true);
+            } else {
+              // Transition right anime to become the new left baseline
+              currentLeft = currentRight;
+              renderLeft(currentLeft);
+              currentRight = getNextUniqueContender(currentLeft);
+              renderRight(currentRight);
+            }
+          }, 1100);
+        } else {
+          rightSide.classList.add("flash-wrong");
+          setTimeout(() => {
+            finishGame(false);
+          }, 1200);
+        }
+      });
+    }
+
+    function finishGame(won) {
+      resultScreen.style.display = "flex";
+      if (won) {
+        resultTitle.textContent = "🏆 Mastermind!";
+        resultTitle.style.color = "var(--correct)";
+        resultDesc.textContent = `Incredible! You cleared all 10 rounds of the Rank Duel without a single mistake.`;
+      } else {
+        resultTitle.textContent = "Duel Over";
+        resultTitle.style.color = "#ff4d4d";
+        resultDesc.textContent = `You reached a streak of ${streak} correct guess${streak === 1 ? '' : 'es'}.`;
+      }
+    }
+
+    btnHigher.addEventListener("click", () => handleGuess(true));
+    btnLower.addEventListener("click", () => handleGuess(false));
+    btnRestart.addEventListener("click", initGame);
+
+    window.addEventListener("DOMContentLoaded", initGame);
+  </script>
+</body>
+</html>
