@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Daily Puzzle Archive & Log — Anidle</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .page-wrapper {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+    .nav-bar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .nav-bar a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .nav-bar a.active, .nav-bar a:hover {
+      color: var(--text-primary);
+    }
+    .editorial-block {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 24px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+      color: #b0b0b2;
+      font-size: 14px;
+    }
+    .editorial-block h1 {
+      color: var(--text-primary);
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .editorial-block h2 {
+      color: var(--text-primary);
+      font-size: 17px;
+      font-weight: 700;
+      margin: 18px 0 8px;
+    }
+    .archive-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .archive-entry {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .archive-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .archive-day-badge {
+      background-color: var(--correct);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+    .archive-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .archive-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .archive-genres {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .archive-tag {
+      font-size: 11px;
+      background: var(--incorrect);
+      padding: 3px 8px;
+      border-radius: 3px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <nav class="nav-bar">
+      <a href="/">← Back to Game</a>
+      <a href="archive.html" class="active">Puzzle Archive</a>
+      <a href="directory.html">Anime Directory</a>
+      <a href="about.html">About & Attribution</a>
+    </nav>
+
+    <!-- Static Crawler-Friendly Content Block -->
+    <section class="editorial-block">
+      <h1>Anidle Daily Puzzle Log &amp; Archive</h1>
+      <p>
+        Welcome to the historical puzzle archive of Anidle. Each day at 00:00 local time, our deterministic scheduling 
+        engine picks a secret anime from our master catalog. This archive chronicles recent daily mystery challenges, 
+        giving players an opportunity to review past solutions, compare clue parameters, and study historical trends.
+      </p>
+
+      <h2>Puzzle Rotation Mechanics</h2>
+      <p>
+        The daily puzzle cycle calculates its index through an elapsed-day offset anchored to January 1, 2024. 
+        Each mystery anime challenges deduction across three balanced axes:
+      </p>
+      <ul style="padding-left: 20px; margin-bottom: 12px;">
+        <li><strong>Chronological Proximity:</strong> Did the title air earlier or later than your guess?</li>
+        <li><strong>Reputational Tier:</strong> Is the title ranked higher or lower in global community standing?</li>
+        <li><strong>Thematic Convergence:</strong> Which canonical genres overlap between the target and your attempts?</li>
+      </ul>
+
+      <h2>Historical Log</h2>
+      <p>
+        Below is the record of recent featured puzzles, showing the target titles, their air year, and their MyAnimeList placement.
+      </p>
+    </section>
+
+    <!-- Archive Entries Rendered Dynamically from Dataset -->
+    <div id="archive-container" class="archive-list"></div>
+  </div>
+
+  <script src="animeData.js"></script>
+  <script>
+    const archiveContainer = document.getElementById("archive-container");
+    const epoch = new Date(2024, 0, 1).getTime();
+    const today = new Date().setHours(0, 0, 0, 0);
+    const currentDayIndex = Math.floor((today - epoch) / (1000 * 60 * 60 * 24));
+
+    // Show the last 30 daily puzzles in reverse order
+    for (let i = 0; i < 30; i++) {
+      const dayOffset = currentDayIndex - i;
+      if (dayOffset < 0) break;
+
+      const animeIndex = dayOffset % MASTER_ANIME_DATA.length;
+      const anime = MASTER_ANIME_DATA[animeIndex];
+
+      const puzzleDate = new Date(epoch + (dayOffset * 86400000));
+      const formattedDate = puzzleDate.toLocaleDateString(undefined, { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+
+      const entry = document.createElement("div");
+      entry.className = "archive-entry";
+      entry.innerHTML = `
+        <div class="archive-left">
+          <span class="archive-day-badge">DAY #${dayOffset}</span>
+          <div>
+            <div class="archive-title">${anime.title}</div>
+            <div class="archive-meta">${formattedDate} • Released ${anime.year} • Rank #${anime.rank}</div>
+          </div>
+        </div>
+        <div class="archive-genres">
+          ${anime.genres.map(g => `<span class="archive-tag">${g}</span>`).join("")}
+        </div>
+      `;
+      archiveContainer.appendChild(entry);
+    }
+  </script>
+</body>
+</html>
