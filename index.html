@@ -13,15 +13,37 @@
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4741478816489817"
      crossorigin="anonymous"></script>
+  
+  <style>
+    .nav-links-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav-links-bar a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links-bar a.active, .nav-links-bar a:hover {
+      color: var(--text-primary);
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
     <header class="header">
       <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
         <button id="help-btn" class="icon-btn" aria-label="Help">?</button>
-        <a href="higher-lower.html" style="color: #ffd700; font-size: 13px; text-decoration: none; font-weight: 700;">Rank Duel</a>
-        <a href="directory.html" style="color: var(--text-secondary); font-size: 13px; text-decoration: none; font-weight: 600;">Directory</a>
-        <a href="archive.html" style="color: var(--text-secondary); font-size: 13px; text-decoration: none; font-weight: 600;">Archive</a>
+        <nav class="nav-links-bar">
+          <a href="/" class="active" style="color: #538d4e;">Anime</a>
+          <a href="character.html">Characters</a>
+          <a href="higher-lower.html">Duel</a>
+          <a href="directory.html">Index</a>
+          <a href="archive.html">Archive</a>
+        </nav>
       </div>
       <h1 class="title">ANIDLE</h1>
       <div class="header-right">
@@ -78,6 +100,11 @@
         Anidle is an interactive daily trivia game designed to test your knowledge of Japanese animation history. Each day at midnight local time, our engine selects a single secret anime from a curated master catalog spanning the 1980s through modern releases. You have six attempts to guess the mystery title using comparative deduction across three key attributes: release year, MyAnimeList (MAL) popularity rank, and genre classifications.
       </p>
 
+      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 6px;">Explore Different Game Modes</h3>
+      <p style="margin-bottom: 12px;">
+        Looking for more challenges? You can play <a href="character.html" style="color: var(--correct); text-decoration: underline; font-weight: 600;">Character Anidle</a> to deduce secret characters and find out who can beat Goku, test your ranking perception in our 10-round <a href="higher-lower.html" style="color: #ffd700; text-decoration: underline; font-weight: 600;">Rank Duel (Higher or Lower)</a>, browse our full database in the <a href="directory.html" style="color: var(--correct); text-decoration: underline;">Anime Directory</a>, or review previous answers in the <a href="archive.html" style="color: var(--correct); text-decoration: underline;">Puzzle Archive</a>.
+      </p>
+
       <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 6px;">Understanding the Clues</h3>
       <ul style="padding-left: 20px; margin-bottom: 16px;">
         <li style="margin-bottom: 6px;"><strong>Release Year:</strong> An upward arrow (↑) indicates the target anime aired <em>later</em> than your guess. A downward arrow (↓) indicates the target anime aired <em>earlier</em>.</li>
@@ -90,7 +117,7 @@
         To consistently solve the daily puzzle within six tries, consider starting with a "mid-distribution" title released between 2010 and 2015 with a rank around #200–#400. Shows like <em>Psycho-Pass</em>, <em>Magi</em>, or <em>Noragami</em> span diverse genres and immediately halve both the chronological and ranking search space.
       </p>
       <p style="margin-bottom: 16px;">
-        Pay close attention to genre mismatches. If your first guess turns up grey on action or comedy, shift your second guess toward slice-of-life, romance, psychological, or sports titles to quickly isolate the target demographic. You can browse our complete dataset anytime in the <a href="directory.html" style="color: var(--correct); text-decoration: underline;">Anime Directory</a> or review past daily answers in our <a href="archive.html" style="color: var(--correct); text-decoration: underline;">Puzzle Archive</a>.
+        Pay close attention to genre mismatches. If your first guess turns up grey on action or comedy, shift your second guess toward slice-of-life, romance, psychological, or sports titles to quickly isolate the target demographic.
       </p>
 
       <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 24px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Frequently Asked Questions</h2>
@@ -122,8 +149,10 @@
       </p>
     </section>
 
-    <!-- Footer links to compliance and internal index pages -->
+    <!-- Footer links to all pages -->
     <footer style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); text-align: center; width: 100%;">
+      <a href="character.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Character Daily</a>
+      <a href="higher-lower.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Rank Duel</a>
       <a href="directory.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Anime Directory</a>
       <a href="archive.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Puzzle Archive</a>
       <a href="about.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">About &amp; Attribution</a>
@@ -188,13 +217,6 @@
     </div>
 
   </div>
-
-
-
-
-  
-  
-  
 
   <script src="animeData.js"></script>
   <script src="app.js"></script>
