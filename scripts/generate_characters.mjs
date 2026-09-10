@@ -11,7 +11,7 @@ if (!apiKey) {
   process.exit(1);
 }
 
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenerativeAI({ apiKey });
 
 // 1. Read master anime catalog
 const animeFilePath = path.join(__dirname, "../animeData.js");
