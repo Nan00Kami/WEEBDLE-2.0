@@ -127,6 +127,14 @@ function renderGuessRow(guessed) {
     genreClass = "partial";
   }
 
+  // Highlight each matched genre in green; unmatched genres keep default color
+  const formattedGenres = guessed.genres.map(g => {
+    const isGenreMatch = targetAnime.genres.includes(g);
+    return isGenreMatch 
+      ? `<span style="color: #79d672; font-weight: 800;">${g}</span>` 
+      : `<span>${g}</span>`;
+  }).join(", ");
+
   const isTitleMatch = guessed.id === targetAnime.id;
 
   row.innerHTML = `
@@ -140,7 +148,7 @@ function renderGuessRow(guessed) {
     <div class="cell ${isRankMatch ? 'correct' : ''}">
       #${guessed.rank} ${!isRankMatch ? `<span class="arrow">${rankArrow}</span>` : ''}
     </div>
-    <div class="cell ${genreClass}">${guessed.genres.slice(0, 2).join(", ")}</div>
+    <div class="cell ${genreClass}">${formattedGenres}</div>
   `;
 
   guessesContainer.appendChild(row);
@@ -167,7 +175,7 @@ function endGame(won, showModal = true) {
 
 function handleImgError(el) {
   el.onerror = null;
-  el.src = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%20viewBox%3D%220%200%2060%2080%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3Ctext%20fill%3D%22%23818384%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENO%20COVER%3C%2Ftext%3E%3C%2Fsvg%3E";
+  el.src = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2280%22%3E%3Crect%20fill%3D%22%23272729%22%20width%3D%2260%22%20height%3D%2280%22%2F%3E%3Ctext%20fill%3D%22%23818384%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENO%20COVER%3C%2Ftext%3E%3C%2Fsvg%3E";
 }
 
 // Search Autocomplete
