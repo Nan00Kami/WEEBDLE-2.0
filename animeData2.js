@@ -5941,4 +5941,3 @@ const MASTER_CHARACTER_DATA = [
     "image": "images/characters/Zero Two.jpg"
   }
 ];
-];
