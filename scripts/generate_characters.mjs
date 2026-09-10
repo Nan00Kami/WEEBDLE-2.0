@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -10,14 +9,6 @@ if (!apiKey) {
   console.error("Missing GEMINI_API_KEY environment variable.");
   process.exit(1);
 }
-
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
-  generationConfig: {
-    responseMimeType: "application/json"
-  }
-});
 
 // 1. Read master anime catalog
 const animeFilePath = path.join(__dirname, "../animeData.js");
@@ -80,9 +71,28 @@ Requirements:
 - Output ONLY valid raw JSON array, without markdown backticks or commentary.
 `;
 
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const rawText = response.text();
+  // Standard v1beta generateContent endpoint
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: "application/json"
+      }
+    })
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error(`HTTP ${res.status}: ${errBody}`);
+  }
+
+  const data = await res.json();
+  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!rawText) throw new Error("No candidate text returned by Gemini");
 
   const cleaned = rawText.trim().replace(/^```json/i, "").replace(/^```/, "").replace(/```$/, "").trim();
   return JSON.parse(cleaned);
