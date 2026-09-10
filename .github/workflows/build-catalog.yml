@@ -1,0 +1,101 @@
+name: Build animeData2.js From Images
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate animeData2.js
+        run: |
+          node -e '
+          const fs = require("fs");
+          const path = require("path");
+
+          const imgDir = "./images/characters";
+          const outPath = "./animeData2.js";
+
+          const files = fs.readdirSync(imgDir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+
+          async function fetchMeta(name) {
+            const query = `
+              query ($search: String) {
+                Character(search: $search) {
+                  name { full }
+                  gender
+                  media(perPage: 1, sort: POPULARITY_DESC) {
+                    nodes {
+                      title { english romaji }
+                      genres
+                    }
+                  }
+                }
+              }
+            `;
+            try {
+              const res = await fetch("https://graphql.anilist.co", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query, variables: { search: name } })
+              });
+              const data = await res.json();
+              return data.data?.Character;
+            } catch {
+              return null;
+            }
+          }
+
+          async function main() {
+            const characters = [];
+            let id = 1;
+
+            for (const file of files) {
+              const rawName = path.parse(file).name.replace(/[-_]/g, " ").trim();
+              console.log(`[${id}/${files.length}] Fetching metadata for: ${rawName}`);
+
+              const meta = await fetchMeta(rawName);
+              const media = meta?.media?.nodes?.[0];
+              const animeTitle = media?.title?.english || media?.title?.romaji || "Unknown Anime";
+              const genres = media?.genres || ["Action"];
+              const gender = meta?.gender || "Unknown";
+
+              characters.push({
+                id: id++,
+                name: meta?.name?.full || rawName,
+                anime: animeTitle,
+                genres: genres,
+                gender: gender,
+                beatsGoku: false,
+                image: `images/characters/${file}`
+              });
+
+              await new Promise(r => setTimeout(r, 700));
+            }
+
+            const output = `// animeData2.js - Master Character Catalog\nconst MASTER_CHARACTER_DATA = ${JSON.stringify(characters, null, 2)};\n`;
+            fs.writeFileSync(outPath, output, "utf8");
+            console.log("Done building catalog!");
+          }
+
+          main();
+          '
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add animeData2.js
+          git commit -m "chore: generate animeData2.js from local images" || echo "No changes"
+          git push origin main
