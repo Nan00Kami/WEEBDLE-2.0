@@ -320,6 +320,7 @@
     <nav class="top-nav">
       <div style="display: flex; gap: 14px; align-items: center;">
         <a href="/">← Classic Anidle</a>
+        <a href="character.html">Characters</a>
         <a href="higher-lower.html" class="active">Rank Duel</a>
         <a href="directory.html">Directory</a>
         <a href="archive.html">Archive</a>
@@ -398,6 +399,7 @@
     <!-- Standard Footer -->
     <footer style="margin-top: 28px; font-size: 12px; color: var(--text-secondary); text-align: center; width: 100%;">
       <a href="/" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Play Classic</a>
+      <a href="character.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Character Daily</a>
       <a href="directory.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Anime Directory</a>
       <a href="archive.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">Puzzle Archive</a>
       <a href="about.html" style="color: var(--text-secondary); text-decoration: underline; margin-right: 14px;">About &amp; Attribution</a>
@@ -440,7 +442,6 @@
     const btnRestart = document.getElementById("btn-restart");
 
     function initGame() {
-      // Clone and shuffle pool
       animePool = [...MASTER_ANIME_DATA].sort(() => 0.5 - Math.random());
       streak = 0;
       updateScoreUI();
@@ -469,21 +470,29 @@
       leftRank.textContent = `#${anime.rank}`;
       leftPoster.src = anime.image;
       leftBg.style.backgroundImage = `url('${anime.image}')`;
+
+      const isAniList = anime.image.includes("anili.st");
+      leftPoster.style.objectPosition = isAniList ? "92% center" : "center center";
+      leftBg.style.backgroundPosition = isAniList ? "92% center" : "center center";
     }
 
     function renderRight(anime) {
       rightTitle.textContent = anime.title;
       rightPoster.src = anime.image;
       rightBg.style.backgroundImage = `url('${anime.image}')`;
+
+      const isAniList = anime.image.includes("anili.st");
+      rightPoster.style.objectPosition = isAniList ? "92% center" : "center center";
+      rightBg.style.backgroundPosition = isAniList ? "92% center" : "center center";
+
       rightRankContainer.style.display = "none";
       actions.style.display = "flex";
       btnHigher.disabled = false;
       btnLower.disabled = false;
       rightSide.className = "anime-side";
       
-      // Trigger animation
       rightContent.classList.remove("slide-in-right");
-      void rightContent.offsetWidth; // force reflow
+      void rightContent.offsetWidth;
       rightContent.classList.add("slide-in-right");
     }
 
@@ -492,7 +501,6 @@
       streakNumEl.textContent = streak;
     }
 
-    // Number ticker effect for dramatic reveal
     function animateValue(obj, start, end, duration, callback) {
       let startTimestamp = null;
       const step = (timestamp) => {
@@ -514,11 +522,9 @@
       btnHigher.disabled = true;
       btnLower.disabled = true;
 
-      // In MAL rank: smaller number = HIGHER rank
       const isActuallyHigher = currentRight.rank < currentLeft.rank;
       const isCorrect = (guessIsHigher && isActuallyHigher) || (!guessIsHigher && !isActuallyHigher);
 
-      // Reveal Right Rank with counter animation
       actions.style.display = "none";
       rightRankContainer.style.display = "flex";
       
@@ -532,7 +538,6 @@
             if (streak >= MAX_ROUNDS) {
               finishGame(true);
             } else {
-              // Transition right anime to become the new left baseline
               currentLeft = currentRight;
               renderLeft(currentLeft);
               currentRight = getNextUniqueContender(currentLeft);
