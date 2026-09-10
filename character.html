@@ -45,39 +45,27 @@
       gap: 5px;
       animation: flipIn 0.5s ease;
     }
-    .nav-links-bar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .nav-links-bar a {
-      color: var(--text-secondary);
-      text-decoration: none;
-    }
-    .nav-links-bar a.active, .nav-links-bar a:hover {
-      color: var(--text-primary);
-    }
   </style>
 </head>
 <body>
   <div class="app-container">
     <header class="header">
       <div class="header-left">
-        <div class="nav-links-bar">
-          <a href="/">Anime</a>
-          <a href="character.html" class="active" style="color: #538d4e;">Characters</a>
-          <a href="higher-lower.html">Duel</a>
-          <a href="directory.html">Index</a>
-          <a href="archive.html">Archive</a>
-        </div>
+        <button class="icon-btn" style="visibility: hidden;">?</button>
       </div>
       <h1 class="title">ANIDLE</h1>
       <div class="header-right">
         <button id="stats-btn" class="icon-btn" aria-label="Stats">📊</button>
       </div>
     </header>
+
+    <nav class="nav-links-bar">
+      <a href="/">Anime</a>
+      <a href="character.html" class="active" style="color: #538d4e;">Characters</a>
+      <a href="higher-lower.html">Duel</a>
+      <a href="directory.html">Index</a>
+      <a href="archive.html">Archive</a>
+    </nav>
 
     <div class="instruction-banner">
       Guess today's mystery anime character. Green means exact match; yellow indicates partial match.
@@ -353,4 +341,3 @@
   </script>
 </body>
 </html>
-```[cite: 8]
