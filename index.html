@@ -13,43 +13,26 @@
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4741478816489817"
      crossorigin="anonymous"></script>
-  
-  <style>
-    .nav-links-bar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .nav-links-bar a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links-bar a.active, .nav-links-bar a:hover {
-      color: var(--text-primary);
-    }
-  </style>
 </head>
 <body>
   <div class="app-container">
     <header class="header">
-      <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
+      <div class="header-left">
         <button id="help-btn" class="icon-btn" aria-label="Help">?</button>
-        <nav class="nav-links-bar">
-          <a href="/" class="active" style="color: #538d4e;">Anime</a>
-          <a href="character.html">Characters</a>
-          <a href="higher-lower.html">Duel</a>
-          <a href="directory.html">Index</a>
-          <a href="archive.html">Archive</a>
-        </nav>
       </div>
       <h1 class="title">ANIDLE</h1>
       <div class="header-right">
         <button id="stats-btn" class="icon-btn" aria-label="Stats">📊</button>
       </div>
     </header>
+
+    <nav class="nav-links-bar">
+      <a href="/" class="active" style="color: #538d4e;">Anime</a>
+      <a href="character.html">Characters</a>
+      <a href="higher-lower.html">Duel</a>
+      <a href="directory.html">Index</a>
+      <a href="archive.html">Archive</a>
+    </nav>
 
     <div class="instruction-banner">
       Guess today's mystery anime. Green means exact match; yellow indicates partial genre match.
