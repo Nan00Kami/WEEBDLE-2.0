@@ -291,6 +291,13 @@
         genreClass = "partial";
       }
 
+      const formattedGenres = guessed.genres.map(g => {
+        const isGenreMatch = targetChar.genres.includes(g);
+        return isGenreMatch 
+          ? `<span style="color: #79d672; font-weight: 800;">${g}</span>` 
+          : `<span>${g}</span>`;
+      }).join(", ");
+
       row.innerHTML = `
         <div class="cell cell-poster">
           <img src="${guessed.image}" alt="${guessed.name}" onerror="handleImgError(this)" />
@@ -300,7 +307,7 @@
         <div class="cell ${isYearMatch ? 'correct' : 'incorrect'}">
           ${guessedYear || '—'} ${!isYearMatch && yearArrow ? `<span class="arrow">${yearArrow}</span>` : ''}
         </div>
-        <div class="cell ${genreClass}">${guessed.genres.slice(0, 2).join(", ")}</div>
+        <div class="cell ${genreClass}">${formattedGenres}</div>
         <div class="cell ${isGenderMatch ? 'correct' : 'incorrect'}">${guessed.gender}</div>
         <div class="cell ${isGokuMatch ? 'correct' : 'incorrect'}">${guessed.beatsGoku ? 'YES' : 'NO'}</div>
       `;
@@ -346,3 +353,4 @@
   </script>
 </body>
 </html>
+```[cite: 8]
