@@ -1,0 +1,30 @@
+name: Sync Exact MAL Ranks
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-ranks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Rank Sync
+        run: node scripts/update_ranks.mjs
+
+      - name: Commit and Push Updated animeData.js
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add animeData.js
+          git commit -m "chore: sync exact live MAL top score ranks" || echo "No changes"
+          git push origin main
