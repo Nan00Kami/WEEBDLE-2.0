@@ -11,7 +11,13 @@ if (!apiKey) {
   process.exit(1);
 }
 
-const ai = new GoogleGenerativeAI({ apiKey });
+const genAI = new GoogleGenerativeAI(apiKey);
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+  generationConfig: {
+    responseMimeType: "application/json"
+  }
+});
 
 // 1. Read master anime catalog
 const animeFilePath = path.join(__dirname, "../animeData.js");
@@ -35,7 +41,7 @@ if (fs.existsSync(charFilePath)) {
       try {
         existingCharacters = eval(charMatch[1]);
       } catch (e) {
-        console.warn("Could not eval animeData2.js, resetting to empty array.");
+        console.warn("Could not parse animeData2.js, resetting to empty array.");
         existingCharacters = [];
       }
     }
@@ -52,10 +58,10 @@ function saveCheckpoint(characters) {
 async function fetchBatch(animeBatch, startId) {
   const prompt = `
 You are an expert anime database builder.
-For each of these anime shows, provide exactly 3 iconic characters:
+For each of these anime shows, select exactly 3 iconic characters:
 ${JSON.stringify(animeBatch.map(a => ({ title: a.title, genres: a.genres })))}
 
-Return ONLY a raw JSON array adhering to this structure:
+Return ONLY a raw JSON array adhering strictly to this structure:
 [
   {
     "id": ${startId},
@@ -68,21 +74,17 @@ Return ONLY a raw JSON array adhering to this structure:
   }
 ]
 
-Rules:
+Requirements:
 - Increment "id" sequentially starting at ${startId}.
-- "beatsGoku" is true ONLY for conceptual reality-warpers, omnipotents, or causality erasers. False for standard fighters.
-- Return ONLY valid JSON. No Markdown ticks, no prose.
+- "beatsGoku" is true ONLY for conceptual reality-warpers, multiversal gods, or causality erasers. False for normal/superhuman fighters.
+- Output ONLY valid raw JSON array, without markdown backticks or commentary.
 `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json"
-    }
-  });
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const rawText = response.text();
 
-  const cleaned = response.text.trim().replace(/^```json/i, "").replace(/^```/, "").replace(/```$/, "").trim();
+  const cleaned = rawText.trim().replace(/^```json/i, "").replace(/^```/, "").replace(/```$/, "").trim();
   return JSON.parse(cleaned);
 }
 
@@ -112,19 +114,18 @@ async function run() {
           existingCharacters.push(...batch);
           currentId += batch.length;
           saveCheckpoint(existingCharacters);
-          console.log(`Saved batch. Catalog now has ${existingCharacters.length} characters.`);
+          console.log(`  Saved batch. Catalog now has ${existingCharacters.length} characters.`);
           success = true;
         } else {
-          throw new Error("Invalid or empty response structure");
+          throw new Error("Invalid or empty response format");
         }
       } catch (err) {
         attempts++;
-        console.warn(`Attempt ${attempts} failed (${err.message}). Retrying in 4 seconds...`);
+        console.warn(`  Attempt ${attempts} failed (${err.message}). Retrying in 4s...`);
         await new Promise(r => setTimeout(r, 4000));
       }
     }
 
-    // Gentle delay between batches
     await new Promise(r => setTimeout(r, 3000));
   }
 
@@ -132,6 +133,6 @@ async function run() {
 }
 
 run().catch(err => {
-  console.error("Script failed:", err);
+  console.error("Workflow failed with error:", err);
   process.exit(1);
 });
