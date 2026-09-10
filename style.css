@@ -373,4 +373,8 @@ body {
     transform: rotateX(0deg);
     opacity: 1;
   }
+  .genre-matched {
+  color: #79d672;
+  font-weight: 800;
+}
 }
